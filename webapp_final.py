@@ -125,11 +125,11 @@ def welcome_page():
     st.markdown("- No identifying information will be stored beyond the duration of the study, and no identifiable data will be shared outside the study team.") 
     st.markdown("- Data may be used in academic publications or presentations, but only in aggregate or anonymized form.") 
 
-    st.write("The insights from this research will help us better understand how AI can support or shape creativity in collaborative settings, and how humans perceive AI as a creative partner.") [cite: 23]
+    st.write("The insights from this research will help us better understand how AI can support or shape creativity in collaborative settings, and how humans perceive AI as a creative partner.") 
     st.write("There are no known risks or discomforts associated with participating in this study.") 
     st.write("Your participation is entirely voluntary. You are free to withdraw at any point without penalty.")
     st.write("You may also choose not to answer any specific questions or discontinue the creative task at any time.") 
-    st.write("Information collected from this study may be used in future research or publications, but your identity will remain confidential and no identifying information will be shared.") [cite: 27]
+    st.write("Information collected from this study may be used in future research or publications, but your identity will remain confidential and no identifying information will be shared.") 
 
     st.subheader("Contact Information")
     st.write("If you have any questions about this research, please contact the Principal Investigator, Nishthaa Lekhi, at nlekhi@umich.edu.") 
