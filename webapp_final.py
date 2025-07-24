@@ -99,7 +99,7 @@ def save_chat_to_file():
 # ------------------------
 def welcome_page():
     st.title("Welcome to the Research Study!")
-    st.header("Consent To Be Part Of A Research Study") [cite: 2]
+    st.header("Consent To Be Part Of A Research Study")
     
     st.subheader("NAME OF STUDY AND RESEARCHERS") [cite: 3]
     st.markdown("---")
