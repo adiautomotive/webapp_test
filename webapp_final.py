@@ -1,3 +1,20 @@
+Here's the fully updated code for your Streamlit application, incorporating all your requests:
+
+1.  **Welcome Page with Consent:** Implemented as `welcome_page()` (page 0), including the full consent text, a mandatory checkbox, and a Prolific ID input. The "Next" button is positioned at the bottom right.
+2.  **Validation for Questions:** Enhanced validation on all survey pages (`survey_page`, `personality_and_ai_survey_page`, `feedback_page`) to ensure all required questions are answered. Error messages will guide the user.
+3.  **Attention Check:** Added the specific attention check question "If you're reading this carefully, select 'Somewhat Agree'." within the first matrix in the `personality_and_ai_survey_page()`.
+4.  **Updated Matrices:** The "Trust and Reliance" and "Perceived Creativity" matrices in `personality_and_ai_survey_page()` have been updated with the statements you provided.
+5.  **AI Response Length:** The AI's responses in the chat (`page3()`) are now limited to `max_tokens=100` to ensure they are shorter and more concise, resembling human-like conversational turns.
+6.  **Radio Button Defaults & Alignment:**
+      * **No Default Selection:** I've updated the radio buttons in the matrices to use `index=None`. This means no option will be pre-selected when the page loads, forcing the user to make an explicit choice.
+      * **Validation:** The validation logic now checks if the radio button's value is `None` to ensure a selection has been made.
+      * **Removed `NOT_SELECTED`:** The `NOT_SELECTED` placeholder is no longer needed.
+      * **Alignment:** The matrix headers and radio buttons are carefully aligned using `st.columns` and `st.markdown` for a clean visual presentation.
+7.  **Final Page:** The "Return to Start" button has been removed from the final "Thank You" page, which now simply instructs the user to close the window.
+
+-----
+
+```python
 import streamlit as st
 from openai import OpenAI
 import json
@@ -16,8 +33,10 @@ CHAT_LOGS_FOLDER = "chat_logs"
 # ChatGPT API Setup
 # ------------------------
 try:
+    # It is recommended to use Streamlit secrets for your API key
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 except Exception as e:
+    # This will prevent the app from crashing if the API key is not set
     client = None
     st.warning("OpenAI API key not found in Streamlit secrets. Chat functionality will be disabled. Please set OPENAI_API_KEY in .streamlit/secrets.toml")
 
@@ -99,42 +118,42 @@ def save_chat_to_file():
 # ------------------------
 def welcome_page():
     st.title("Welcome to the Research Study!")
-    st.header("Consent To Be Part Of A Research Study") # [cite: 2] - Citation removed from Python code
+    st.header("Consent To Be Part Of A Research Study")
     
-    st.subheader("NAME OF STUDY AND RESEARCHERS") # [cite: 3] - Citation removed from Python code
+    st.subheader("NAME OF STUDY AND RESEARCHERS")
     st.markdown("---")
-    st.markdown("**Title of Project:** Investigating Human-AI Creative Collaboration") # [cite: 4]
-    st.markdown("**Principal Investigator:** Dr. Areen Alsaid, Assistant Professor, University of Michigan-Dearborn") # [cite: 5]
-    st.markdown("**Study Team Members:** Nishthaa Lekhi, Masters Student, University of Michigan-Dearborn") # [cite: 6]
+    st.markdown("**Title of Project:** Investigating Human-AI Creative Collaboration")
+    st.markdown("**Principal Investigator:** Dr. Areen Alsaid, Assistant Professor, University of Michigan-Dearborn")
+    st.markdown("**Study Team Members:** Nishthaa Lekhi, Masters Student, University of Michigan-Dearborn")
     st.markdown("---")
     
-    st.subheader("GENERAL INFORMATION") # [cite: 8]
-    st.write("You are invited to participate in a research study exploring how people engage in creative collaboration with AI systems like ChatGPT.") # [cite: 9]
-    st.write("This study aims to understand how ideas develop in back-and-forth conversations between humans and AI, and how such interactions shape the creative process and outcomes.") # [cite: 10]
+    st.subheader("GENERAL INFORMATION")
+    st.write("You are invited to participate in a research study exploring how people engage in creative collaboration with AI systems like ChatGPT.")
+    st.write("This study aims to understand how ideas develop in back-and-forth conversations between humans and AI, and how such interactions shape the creative process and outcomes.")
 
-    st.subheader("If you agree to take part in this study, you will be asked to:") # [cite: 11]
-    st.markdown("- Complete a brief pre-activity survey.") # [cite: 12]
-    st.markdown("- Take part in a creative writing task with ChatGPT. You’ll interact with the AI by exchanging ideas and building a fictional scenario together.") # [cite: 13]
-    st.markdown("- Complete a post-activity survey, which will ask for feedback on the experience and your perception of the co-creative process.") # [cite: 14]
+    st.subheader("If you agree to take part in this study, you will be asked to:")
+    st.markdown("- Complete a brief pre-activity survey.")
+    st.markdown("- Take part in a creative writing task with ChatGPT. You’ll interact with the AI by exchanging ideas and building a fictional scenario together.")
+    st.markdown("- Complete a post-activity survey, which will ask for feedback on the experience and your perception of the co-creative process.")
 
-    st.subheader("Data Collection and Privacy") # [cite: 15]
-    st.markdown("- Your conversation with ChatGPT will be saved and securely stored in a Streamlit-hosted research database.") # [cite: 16]
-    st.markdown("- These conversations will be accessible only to the study team and will be reviewed for analysis.") # [cite: 17]
-    st.markdown("- If any identifying information is present in your responses, it will be removed during data cleaning.") # [cite: 18]
-    st.markdown("- All data from the surveys will be collected and stored on a Streamlit cloud.") # [cite: 19]
-    st.markdown("- This information will include your response regarding your demographics, personality, and post-activity reflections.") # [cite: 20]
-    st.markdown("- No identifying information will be stored beyond the duration of the study, and no identifiable data will be shared outside the study team.") # [cite: 21]
-    st.markdown("- Data may be used in academic publications or presentations, but only in aggregate or anonymized form.") # [cite: 22]
+    st.subheader("Data Collection and Privacy")
+    st.markdown("- Your conversation with ChatGPT will be saved and securely stored in a Streamlit-hosted research database.")
+    st.markdown("- These conversations will be accessible only to the study team and will be reviewed for analysis.")
+    st.markdown("- If any identifying information is present in your responses, it will be removed during data cleaning.")
+    st.markdown("- All data from the surveys will be collected and stored on a Streamlit cloud.")
+    st.markdown("- This information will include your response regarding your demographics, personality, and post-activity reflections.")
+    st.markdown("- No identifying information will be stored beyond the duration of the study, and no identifiable data will be shared outside the study team.")
+    st.markdown("- Data may be used in academic publications or presentations, but only in aggregate or anonymized form.")
 
-    st.write("The insights from this research will help us better understand how AI can support or shape creativity in collaborative settings, and how humans perceive AI as a creative partner.") # [cite: 23]
-    st.write("There are no known risks or discomforts associated with participating in this study.") # [cite: 24]
-    st.write("Your participation is entirely voluntary. You are free to withdraw at any point without penalty.") # [cite: 25]
-    st.write("You may also choose not to answer any specific questions or discontinue the creative task at any time.") # [cite: 26]
-    st.write("Information collected from this study may be used in future research or publications, but your identity will remain confidential and no identifying information will be shared.") # [cite: 27]
+    st.write("The insights from this research will help us better understand how AI can support or shape creativity in collaborative settings, and how humans perceive AI as a creative partner.")
+    st.write("There are no known risks or discomforts associated with participating in this study.")
+    st.write("Your participation is entirely voluntary. You are free to withdraw at any point without penalty.")
+    st.write("You may also choose not to answer any specific questions or discontinue the creative task at any time.")
+    st.write("Information collected from this study may be used in future research or publications, but your identity will remain confidential and no identifying information will be shared.")
 
     st.subheader("Contact Information")
-    st.write("If you have any questions about this research, please contact the Principal Investigator, Nishthaa Lekhi, at nlekhi@umich.edu.") # [cite: 28]
-    st.write("You may also reach out to the faculty advisor, Dr. Areen Alsaid at alsaid@Umich.edu.") # [cite: 29]
+    st.write("If you have any questions about this research, please contact the Principal Investigator, Nishthaa Lekhi, at nlekhi@umich.edu.")
+    st.write("You may also reach out to the faculty advisor, Dr. Areen Alsaid at alsaid@Umich.edu.")
     
     st.markdown("---")
 
@@ -229,7 +248,7 @@ def survey_page():
         """)
         
         if os.path.exists("images/SAM Model.jpeg"):
-            st.image("images/SAM Model.jpeg", caption="Self-Assessment Manikin (SAM)", use_container_width=True) # Changed from use_column_width
+            st.image("images/SAM Model.jpeg", caption="Self-Assessment Manikin (SAM)", use_container_width=True)
         else:
             st.warning("SAM Model image not found. Make sure it's in an 'images' subfolder.")
 
@@ -276,6 +295,11 @@ def personality_and_ai_survey_page():
             div.row-widget.stRadio > div > label {
                 padding: 0 20px;
             }
+            /* Ensure alignment for matrix questions */
+            .stForm > div > div > div > div > div.stColumns > div:first-child {
+                display: flex;
+                align-items: center;
+            }
         </style>
     """, unsafe_allow_html=True)
 
@@ -321,37 +345,34 @@ def personality_and_ai_survey_page():
     
     with st.form("personality_survey_form"):
         responses = {}
-        
         all_questions_answered = True
         
         for section, questions in matrix_questions.items():
             st.subheader(section)
             
-            # Header for Likert scale options
-            header_cols = st.columns([3, 5])
-            with header_cols[1]:
-                sub_cols = st.columns(len(likert_options))
-                for i, option in enumerate(likert_options):
-                    with sub_cols[i]:
-                        st.markdown(f'<p style="text-align: center; font-weight: bold;">{option}</p>', unsafe_allow_html=True)
+            # Header for Likert scale options - aligned with columns
+            header_cols = st.columns([3, 1, 1, 1, 1, 1]) # Adjust column widths for better alignment
+            with header_cols[1]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[0]}</p>', unsafe_allow_html=True)
+            with header_cols[2]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[1]}</p>', unsafe_allow_html=True)
+            with header_cols[3]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[2]}</p>', unsafe_allow_html=True)
+            with header_cols[4]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[3]}</p>', unsafe_allow_html=True)
+            with header_cols[5]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[4]}</p>', unsafe_allow_html=True)
             st.divider()
 
             for stmt in questions:
-                row_cols = st.columns([3, 5])
+                row_cols = st.columns([3, 5]) # Keep this for question text and radio group
                 with row_cols[0]:
                     st.write(stmt)
                 with row_cols[1]:
-                    # Use a unique default value for validation
-                    default_selection = "NOT_SELECTED" 
                     selected_value = st.radio(
                         label=stmt, 
-                        options=likert_options + [default_selection], 
-                        index=len(likert_options), # Select the invisible default initially
+                        options=likert_options, 
+                        index=None, # No default selected
                         key=f"personality_{stmt.replace(' ', '_').replace('.', '').replace('?', '').replace(':', '')}", # Ensure unique key
                         horizontal=True,
                         label_visibility="collapsed"
                     )
-                    if selected_value == default_selection:
+                    if selected_value is None: # Check if a selection was made
                         all_questions_answered = False
                     responses[stmt] = selected_value # Store the selected value
             st.markdown("---")
@@ -360,14 +381,9 @@ def personality_and_ai_survey_page():
         if submitted:
             if not all_questions_answered:
                 st.error("Please answer all questions before proceeding.")
-            elif responses["If you're reading this carefully, select 'Somewhat Agree'."] != "Somewhat Agree":
+            elif responses.get("If you're reading this carefully, select 'Somewhat Agree'.") != "Somewhat Agree":
                 st.error("Attention check failed. Please review your answers carefully and select 'Somewhat Agree' for the attention check question.")
             else:
-                # Remove the internal default selection if it was passed through
-                for key in list(responses.keys()):
-                    if responses[key] == default_selection: # Should not happen if validation passes
-                        del responses[key] 
-
                 st.session_state.survey_responses.update(responses)
                 st.session_state.page = 3
                 st.rerun()
@@ -427,7 +443,11 @@ def page3():
         if client: # Only try to call API if client is initialized
             with st.spinner("Your teammate is thinking..."):
                 try:
-                    response = client.chat.completions.create(model="gpt-4", messages=st.session_state.chat_history)
+                    response = client.chat.completions.create(
+                        model="gpt-4", 
+                        messages=st.session_state.chat_history,
+                        max_tokens=100 # Limit AI response length to be more concise
+                    )
                     reply = response.choices[0].message.content
                     st.session_state.chat_history.append({"role": "assistant", "content": reply})
                 except Exception as e:
@@ -448,12 +468,18 @@ def page3():
 # ------------------------
 def page4():
     st.title("Summary")
-    summary_text = st.text_area("Please summarize your discussion:", key="summary_text", height=300)
+    
+    # The text area itself updates st.session_state.summary_text because of the key
+    st.text_area("Please summarize your discussion:", key="summary_text", height=300)
+    
+    # Get current value from session_state for validation
+    current_summary_text = st.session_state.get("summary_text", "") 
+
     if st.button("Submit Summary", key="submit_summary_btn"):
-        if summary_text.strip() == "":
+        if current_summary_text.strip() == "": # Check the value from session_state
             st.error("Please provide a summary before proceeding.")
         else:
-            st.session_state.summary_text = summary_text
+            # The value is already in st.session_state.summary_text
             st.session_state.page = 6
             st.rerun()
 
@@ -476,6 +502,11 @@ def feedback_page():
             }
             div.row-widget.stRadio > div > label {
                 padding: 0 20px;
+            }
+            /* Ensure alignment for matrix questions */
+            .stForm > div > div > div > div > div.stColumns > div:first-child {
+                display: flex;
+                align-items: center;
             }
         </style>
     """, unsafe_allow_html=True)
@@ -511,13 +542,13 @@ def feedback_page():
         for section, questions in matrix_questions.items():
             st.subheader(section)
             
-            # Header for Likert scale options
-            header_cols = st.columns([3, 5])
-            with header_cols[1]:
-                sub_cols = st.columns(len(likert_options))
-                for i, option in enumerate(likert_options):
-                    with sub_cols[i]:
-                        st.markdown(f'<p style="text-align: center; font-weight: bold;">{option}</p>', unsafe_allow_html=True)
+            # Header for Likert scale options - aligned with columns
+            header_cols = st.columns([3, 1, 1, 1, 1, 1]) # Adjust column widths for better alignment
+            with header_cols[1]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[0]}</p>', unsafe_allow_html=True)
+            with header_cols[2]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[1]}</p>', unsafe_allow_html=True)
+            with header_cols[3]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[2]}</p>', unsafe_allow_html=True)
+            with header_cols[4]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[3]}</p>', unsafe_allow_html=True)
+            with header_cols[5]: st.markdown(f'<p style="text-align: center; font-weight: bold;">{likert_options[4]}</p>', unsafe_allow_html=True)
             st.divider()
 
             for stmt in questions:
@@ -527,17 +558,15 @@ def feedback_page():
                     st.write(stmt)
                 
                 with row_cols[1]:
-                    # Use a unique default value for validation
-                    default_selection = "NOT_SELECTED" 
                     selected_value = st.radio(
                         label=stmt, 
-                        options=likert_options + [default_selection], 
-                        index=len(likert_options), # Select the invisible default initially
+                        options=likert_options, 
+                        index=None, # No default selected
                         key=f"fb_{stmt.replace(' ', '_').replace('.', '').replace('?', '').replace(':', '')}", # Ensure unique key
                         horizontal=True,
                         label_visibility="collapsed"
                     )
-                    if selected_value == default_selection:
+                    if selected_value is None: # Check if a selection was made
                         all_feedback_answered = False
                     responses[stmt] = selected_value # Store the selected value
             st.markdown("---")
@@ -552,7 +581,7 @@ def feedback_page():
         """)
         
         if os.path.exists("images/SAM Model.jpeg"):
-            st.image("images/SAM Model.jpeg", caption="SAM Model", use_container_width=True) # Changed from use_column_width
+            st.image("images/SAM Model.jpeg", caption="SAM Model", use_container_width=True)
         else:
             st.warning("SAM Model image not found.")
         
@@ -564,11 +593,6 @@ def feedback_page():
             if not all_feedback_answered:
                 st.error("Please answer all feedback questions before proceeding.")
             else:
-                # Remove the internal default selection if it was passed through
-                for key in list(responses.keys()):
-                    if responses[key] == default_selection: # Should not happen if validation passes
-                        del responses[key] 
-
                 st.session_state.feedback_responses = responses
                 save_chat_to_file()
                 st.session_state.page = 7
@@ -733,3 +757,4 @@ def admin_view():
 # ------------------------
 if __name__ == "__main__":
     main()
+
