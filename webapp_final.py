@@ -100,45 +100,44 @@ def save_chat_to_file():
 def welcome_page():
     st.title("Welcome to the Research Study!")
     st.header("Consent To Be Part Of A Research Study")
-    
-    st.subheader("NAME OF STUDY AND RESEARCHERS") [cite: 3]
+    st.subheader("NAME OF STUDY AND RESEARCHERS")
     st.markdown("---")
-    st.markdown("**Title of Project:** Investigating Human-AI Creative Collaboration") [cite: 4]
-    st.markdown("**Principal Investigator:** Dr. Areen Alsaid, Assistant Professor, University of Michigan-Dearborn") [cite: 5]
-    st.markdown("**Study Team Members:** Nishthaa Lekhi, Masters Student, University of Michigan-Dearborn") [cite: 6]
+    st.markdown("**Title of Project:** Investigating Human-AI Creative Collaboration") 
+    st.markdown("**Principal Investigator:** Dr. Areen Alsaid, Assistant Professor, University of Michigan-Dearborn") 
+    st.markdown("**Study Team Members:** Nishthaa Lekhi, Masters Student, University of Michigan-Dearborn") 
     st.markdown("---")
     
-    st.subheader("GENERAL INFORMATION") [cite: 8]
-    st.write("You are invited to participate in a research study exploring how people engage in creative collaboration with AI systems like ChatGPT.") [cite: 9]
-    st.write("This study aims to understand how ideas develop in back-and-forth conversations between humans and AI, and how such interactions shape the creative process and outcomes.") [cite: 10]
+    st.subheader("GENERAL INFORMATION") 
+    st.write("You are invited to participate in a research study exploring how people engage in creative collaboration with AI systems like ChatGPT.")
+    st.write("This study aims to understand how ideas develop in back-and-forth conversations between humans and AI, and how such interactions shape the creative process and outcomes.") 
 
-    st.subheader("If you agree to take part in this study, you will be asked to:") [cite: 11]
-    st.markdown("- Complete a brief pre-activity survey.") [cite: 12]
-    st.markdown("- Take part in a creative writing task with ChatGPT. You’ll interact with the AI by exchanging ideas and building a fictional scenario together.") [cite: 13]
-    st.markdown("- Complete a post-activity survey, which will ask for feedback on the experience and your perception of the co-creative process.") [cite: 14]
+    st.subheader("If you agree to take part in this study, you will be asked to:")
+    st.markdown("- Complete a brief pre-activity survey.")
+    st.markdown("- Take part in a creative writing task with ChatGPT. You’ll interact with the AI by exchanging ideas and building a fictional scenario together.") 
+    st.markdown("- Complete a post-activity survey, which will ask for feedback on the experience and your perception of the co-creative process.")
 
-    st.subheader("Data Collection and Privacy") [cite: 15]
-    st.markdown("- Your conversation with ChatGPT will be saved and securely stored in a Streamlit-hosted research database.") [cite: 16]
-    st.markdown("- These conversations will be accessible only to the study team and will be reviewed for analysis.") [cite: 17]
-    st.markdown("- If any identifying information is present in your responses, it will be removed during data cleaning.") [cite: 18]
-    st.markdown("- All data from the surveys will be collected and stored on a Streamlit cloud.") [cite: 19]
-    st.markdown("- This information will include your response regarding your demographics, personality, and post-activity reflections.") [cite: 20]
-    st.markdown("- No identifying information will be stored beyond the duration of the study, and no identifiable data will be shared outside the study team.") [cite: 21]
-    st.markdown("- Data may be used in academic publications or presentations, but only in aggregate or anonymized form.") [cite: 22]
+    st.subheader("Data Collection and Privacy") 
+    st.markdown("- Your conversation with ChatGPT will be saved and securely stored in a Streamlit-hosted research database.") 
+    st.markdown("- These conversations will be accessible only to the study team and will be reviewed for analysis.")
+    st.markdown("- If any identifying information is present in your responses, it will be removed during data cleaning.") 
+    st.markdown("- All data from the surveys will be collected and stored on a Streamlit cloud.") 
+    st.markdown("- This information will include your response regarding your demographics, personality, and post-activity reflections.") 
+    st.markdown("- No identifying information will be stored beyond the duration of the study, and no identifiable data will be shared outside the study team.") 
+    st.markdown("- Data may be used in academic publications or presentations, but only in aggregate or anonymized form.") 
 
     st.write("The insights from this research will help us better understand how AI can support or shape creativity in collaborative settings, and how humans perceive AI as a creative partner.") [cite: 23]
-    st.write("There are no known risks or discomforts associated with participating in this study.") [cite: 24]
-    st.write("Your participation is entirely voluntary. You are free to withdraw at any point without penalty.") [cite: 25]
-    st.write("You may also choose not to answer any specific questions or discontinue the creative task at any time.") [cite: 26]
+    st.write("There are no known risks or discomforts associated with participating in this study.") 
+    st.write("Your participation is entirely voluntary. You are free to withdraw at any point without penalty.")
+    st.write("You may also choose not to answer any specific questions or discontinue the creative task at any time.") 
     st.write("Information collected from this study may be used in future research or publications, but your identity will remain confidential and no identifying information will be shared.") [cite: 27]
 
     st.subheader("Contact Information")
-    st.write("If you have any questions about this research, please contact the Principal Investigator, Nishthaa Lekhi, at nlekhi@umich.edu.") [cite: 28]
-    st.write("You may also reach out to the faculty advisor, Dr. Areen Alsaid at alsaid@Umich.edu.") [cite: 29]
+    st.write("If you have any questions about this research, please contact the Principal Investigator, Nishthaa Lekhi, at nlekhi@umich.edu.") 
+    st.write("You may also reach out to the faculty advisor, Dr. Areen Alsaid at alsaid@Umich.edu.") 
     
     st.markdown("---")
 
-    consent_agreed = st.checkbox("I have read and understand the above information and consent to participate in this research study.", key="consent_checkbox") [cite: 25]
+    consent_agreed = st.checkbox("I have read and understand the above information and consent to participate in this research study.", key="consent_checkbox")
     
     login_type = st.radio("Login as:", ["Participant", "Admin"], horizontal=True, key="login_type_radio")
 
