@@ -30,13 +30,13 @@ def main():
 
     # Page routing dictionary
     pages = {
-        0: welcome_page, # New Welcome Page
-        1: survey_page,
-        2: personality_and_ai_survey_page,
+        0: welcome_page, # New Welcome Page (Consent)
+        1: survey_page, # Demographics and initial SAM
+        2: personality_and_ai_survey_page, # Personality, AI Trust/Creativity, Attention Check
         3: page2, # Instructions
         4: page3, # Chat page
         5: page4, # Summary
-        6: feedback_page,
+        6: feedback_page, # Post-task feedback and final SAM
         7: page5, # Thank You page
         99: admin_view
     }
@@ -47,6 +47,7 @@ def main():
     else:
         st.session_state.page = 0 # Default to first page if state is invalid
         welcome_page() # Use welcome_page as the default
+
 
 # ------------------------
 # Helper for Next Button (positioned bottom right)
@@ -98,46 +99,46 @@ def save_chat_to_file():
 # ------------------------
 def welcome_page():
     st.title("Welcome to the Research Study!")
-    [cite_start]st.header("Consent To Be Part Of A Research Study [cite: 2]")
+    st.header("Consent To Be Part Of A Research Study") [cite: 2]
     
-    [cite_start]st.subheader("NAME OF STUDY AND RESEARCHERS [cite: 3]")
+    st.subheader("NAME OF STUDY AND RESEARCHERS") [cite: 3]
     st.markdown("---")
-    [cite_start]st.markdown("**Title of Project:** Investigating Human-AI Creative Collaboration [cite: 4]")
-    [cite_start]st.markdown("**Principal Investigator:** Dr. Areen Alsaid, Assistant Professor, University of Michigan-Dearborn [cite: 5]")
-    [cite_start]st.markdown("**Study Team Members:** Nishthaa Lekhi, Masters Student, University of Michigan-Dearborn [cite: 6]")
+    st.markdown("**Title of Project:** Investigating Human-AI Creative Collaboration") [cite: 4]
+    st.markdown("**Principal Investigator:** Dr. Areen Alsaid, Assistant Professor, University of Michigan-Dearborn") [cite: 5]
+    st.markdown("**Study Team Members:** Nishthaa Lekhi, Masters Student, University of Michigan-Dearborn") [cite: 6]
     st.markdown("---")
     
-    [cite_start]st.subheader("GENERAL INFORMATION [cite: 8]")
-    [cite_start]st.write("You are invited to participate in a research study exploring how people engage in creative collaboration with AI systems like ChatGPT. [cite: 9]")
-    [cite_start]st.write("This study aims to understand how ideas develop in back-and-forth conversations between humans and AI, and how such interactions shape the creative process and outcomes. [cite: 10]")
+    st.subheader("GENERAL INFORMATION") [cite: 8]
+    st.write("You are invited to participate in a research study exploring how people engage in creative collaboration with AI systems like ChatGPT.") [cite: 9]
+    st.write("This study aims to understand how ideas develop in back-and-forth conversations between humans and AI, and how such interactions shape the creative process and outcomes.") [cite: 10]
 
-    [cite_start]st.subheader("If you agree to take part in this study, you will be asked to: [cite: 11]")
-    [cite_start]st.markdown("- Complete a brief pre-activity survey. [cite: 12]")
-    [cite_start]st.markdown("- Take part in a creative writing task with ChatGPT. You’ll interact with the AI by exchanging ideas and building a fictional scenario together. [cite: 13]")
-    [cite_start]st.markdown("- Complete a post-activity survey, which will ask for feedback on the experience and your perception of the co-creative process. [cite: 14]")
+    st.subheader("If you agree to take part in this study, you will be asked to:") [cite: 11]
+    st.markdown("- Complete a brief pre-activity survey.") [cite: 12]
+    st.markdown("- Take part in a creative writing task with ChatGPT. You’ll interact with the AI by exchanging ideas and building a fictional scenario together.") [cite: 13]
+    st.markdown("- Complete a post-activity survey, which will ask for feedback on the experience and your perception of the co-creative process.") [cite: 14]
 
-    [cite_start]st.subheader("Data Collection and Privacy [cite: 15]")
-    [cite_start]st.markdown("- Your conversation with ChatGPT will be saved and securely stored in a Streamlit-hosted research database. [cite: 16]")
-    [cite_start]st.markdown("- These conversations will be accessible only to the study team and will be reviewed for analysis. [cite: 17]")
-    [cite_start]st.markdown("- If any identifying information is present in your responses, it will be removed during data cleaning. [cite: 18]")
-    [cite_start]st.markdown("- All data from the surveys will be collected and stored on a Streamlit cloud. [cite: 19]")
-    [cite_start]st.markdown("- This information will include your response regarding your demographics, personality, and post-activity reflections. [cite: 20]")
-    [cite_start]st.markdown("- No identifying information will be stored beyond the duration of the study, and no identifiable data will be shared outside the study team. [cite: 21]")
-    [cite_start]st.markdown("- Data may be used in academic publications or presentations, but only in aggregate or anonymized form. [cite: 22]")
+    st.subheader("Data Collection and Privacy") [cite: 15]
+    st.markdown("- Your conversation with ChatGPT will be saved and securely stored in a Streamlit-hosted research database.") [cite: 16]
+    st.markdown("- These conversations will be accessible only to the study team and will be reviewed for analysis.") [cite: 17]
+    st.markdown("- If any identifying information is present in your responses, it will be removed during data cleaning.") [cite: 18]
+    st.markdown("- All data from the surveys will be collected and stored on a Streamlit cloud.") [cite: 19]
+    st.markdown("- This information will include your response regarding your demographics, personality, and post-activity reflections.") [cite: 20]
+    st.markdown("- No identifying information will be stored beyond the duration of the study, and no identifiable data will be shared outside the study team.") [cite: 21]
+    st.markdown("- Data may be used in academic publications or presentations, but only in aggregate or anonymized form.") [cite: 22]
 
-    [cite_start]st.write("The insights from this research will help us better understand how AI can support or shape creativity in collaborative settings, and how humans perceive AI as a creative partner. [cite: 23]")
-    [cite_start]st.write("There are no known risks or discomforts associated with participating in this study. [cite: 24]")
-    [cite_start]st.write("Your participation is entirely voluntary. You are free to withdraw at any point without penalty. [cite: 25]")
-    [cite_start]st.write("You may also choose not to answer any specific questions or discontinue the creative task at any time. [cite: 26]")
-    [cite_start]st.write("Information collected from this study may be used in future research or publications, but your identity will remain confidential and no identifying information will be shared. [cite: 27]")
+    st.write("The insights from this research will help us better understand how AI can support or shape creativity in collaborative settings, and how humans perceive AI as a creative partner.") [cite: 23]
+    st.write("There are no known risks or discomforts associated with participating in this study.") [cite: 24]
+    st.write("Your participation is entirely voluntary. You are free to withdraw at any point without penalty.") [cite: 25]
+    st.write("You may also choose not to answer any specific questions or discontinue the creative task at any time.") [cite: 26]
+    st.write("Information collected from this study may be used in future research or publications, but your identity will remain confidential and no identifying information will be shared.") [cite: 27]
 
     st.subheader("Contact Information")
-    [cite_start]st.write("If you have any questions about this research, please contact the Principal Investigator, Nishthaa Lekhi, at nlekhi@umich.edu. [cite: 28]")
-    [cite_start]st.write("You may also reach out to the faculty advisor, Dr. Areen Alsaid at alsaid@Umich.edu. [cite: 29]")
+    st.write("If you have any questions about this research, please contact the Principal Investigator, Nishthaa Lekhi, at nlekhi@umich.edu.") [cite: 28]
+    st.write("You may also reach out to the faculty advisor, Dr. Areen Alsaid at alsaid@Umich.edu.") [cite: 29]
     
     st.markdown("---")
 
-    consent_agreed = st.checkbox("I have read and understand the above information and consent to participate in this research study.", key="consent_checkbox")
+    consent_agreed = st.checkbox("I have read and understand the above information and consent to participate in this research study.", key="consent_checkbox") [cite: 25]
     
     login_type = st.radio("Login as:", ["Participant", "Admin"], horizontal=True, key="login_type_radio")
 
@@ -148,8 +149,8 @@ def welcome_page():
             submitted = st.form_submit_button("Start Survey")
             if submitted:
                 if consent_agreed:
-                    if new_id:
-                        st.session_state.prolific_id = new_id
+                    if new_id and new_id.strip() != "": # Ensure ID is not empty or just spaces
+                        st.session_state.prolific_id = new_id.strip()
                         st.session_state.page = 1
                         st.rerun()
                     else:
@@ -168,7 +169,7 @@ def welcome_page():
 
 
 # ------------------------
-# Page 1.5: Survey (Now Page 1)
+# Page 1: Pre-Activity Survey
 # ------------------------
 def survey_page():
     st.title("University of Michigan Research Survey")
@@ -177,15 +178,45 @@ def survey_page():
         responses = {}
         
         # Demographics
-        responses['age'] = st.number_input("How old are you?", min_value=0, max_value=120, step=1, key="age_input")
-        responses['gender'] = st.radio("Which gender do you identify with?", ["Male", "Female", "Non-binary / third gender", "Prefer not to say"], key="gender_radio")
-        responses['education'] = st.radio("What is the highest level of education that you have completed?", ["Highschool", "Bachelor's Degree", "Master's degree", "Doctorate", "Other"], key="education_radio")
-        if responses['education'] == "Other":
-            responses['education_other'] = st.text_input("Please specify your education level:", key="education_other_input")
-        responses['religion'] = st.text_input("Which religion do you align with, if any?", key="religion_input")
+        responses['age'] = st.number_input("How old are you?", min_value=1, max_value=120, step=1, key="age_input", value=None, placeholder="Enter age") # Set value=None for validation
+        
+        # Gender with a "Please select" default for validation
+        gender_options = ["- Please select -", "Male", "Female", "Non-binary / third gender", "Prefer not to say"]
+        selected_gender = st.radio("Which gender do you identify with?", gender_options, index=0, key="gender_radio")
+        if selected_gender == gender_options[0]:
+            responses['gender'] = None # Mark for validation
+        else:
+            responses['gender'] = selected_gender
 
-        responses['experience_with_ai'] = st.radio("How familiar are you with AI tools like ChatGPT?", ["Not familiar", "Somewhat familiar", "Very familiar"], key="ai_familiarity_radio")
-        responses['creative_writing_frequency'] = st.radio("How often do you engage in creative writing (e.g., stories, blogs)?", ["Never", "Sometimes", "Often"], key="creative_writing_radio")
+        # Education with a "Please select" default for validation
+        education_options = ["- Please select -", "Highschool", "Bachelor's Degree", "Master's degree", "Doctorate", "Other"]
+        selected_education = st.radio("What is the highest level of education that you have completed?", education_options, index=0, key="education_radio")
+        if selected_education == education_options[0]:
+            responses['education'] = None # Mark for validation
+        else:
+            responses['education'] = selected_education
+            if responses['education'] == "Other":
+                responses['education_other'] = st.text_input("Please specify your education level:", key="education_other_input")
+            else:
+                responses['education_other'] = "" # Clear if not "Other"
+        
+        responses['religion'] = st.text_input("Which religion do you align with, if any? (Optional)", key="religion_input") # Made optional
+
+        # AI Familiarity with a "Please select" default for validation
+        ai_familiarity_options = ["- Please select -", "Not familiar", "Somewhat familiar", "Very familiar"]
+        selected_ai_familiarity = st.radio("How familiar are you with AI tools like ChatGPT?", ai_familiarity_options, index=0, key="ai_familiarity_radio")
+        if selected_ai_familiarity == ai_familiarity_options[0]:
+            responses['experience_with_ai'] = None # Mark for validation
+        else:
+            responses['experience_with_ai'] = selected_ai_familiarity
+
+        # Creative Writing Frequency with a "Please select" default for validation
+        creative_writing_options = ["- Please select -", "Never", "Sometimes", "Often"]
+        selected_creative_writing = st.radio("How often do you engage in creative writing (e.g., stories, blogs)?", creative_writing_options, index=0, key="creative_writing_radio")
+        if selected_creative_writing == creative_writing_options[0]:
+            responses['creative_writing_frequency'] = None # Mark for validation
+        else:
+            responses['creative_writing_frequency'] = selected_creative_writing
         
         st.markdown("---")
         st.subheader("Block 2: Current Emotional State (SAM)")
@@ -207,11 +238,19 @@ def survey_page():
         
         submitted = st.form_submit_button("Next")
         if submitted:
-            # Simple validation for essential fields - could be expanded
-            if responses['age'] == 0:
+            # Validation logic
+            if responses['age'] is None or responses['age'] <= 0:
                 st.error("Please enter your age.")
-            elif responses['gender'] == "Male" and responses['education'] == "Highschool" and not responses['religion']: # Check if user moved from defaults
-                st.error("Please answer all demographic questions.")
+            elif responses['gender'] is None:
+                st.error("Please select your gender.")
+            elif responses['education'] is None:
+                st.error("Please select your highest level of education.")
+            elif responses['experience_with_ai'] is None:
+                st.error("Please indicate your familiarity with AI tools.")
+            elif responses['creative_writing_frequency'] is None:
+                st.error("Please indicate how often you engage in creative writing.")
+            elif responses['education'] == "Other" and not responses['education_other'].strip():
+                st.error("Please specify your education level.")
             else:
                 st.session_state.survey_responses = responses
                 st.session_state.page = 2
@@ -223,6 +262,7 @@ def survey_page():
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
+    # Custom CSS for horizontal radio buttons and hiding labels
     st.markdown("""
         <style>
             div.row-widget.stRadio > div {
@@ -249,8 +289,8 @@ def personality_and_ai_survey_page():
             "is outgoing, sociable",
             "tends to find faults with others",
             "does a thorough job",
-            # ATTENTION CHECK HERE
-            "If you're reading this carefully, select 'Somewhat Agree'.", # Attention Check
+            # ATTENTION CHECK HERE (Block 2, Question 11, after "does a thorough job")
+            "If you're reading this carefully, select 'Somewhat Agree'.", 
             "gets nervous easily"
         ],
         "Work Style Preference": [
@@ -258,15 +298,16 @@ def personality_and_ai_survey_page():
             "If given a choice: I would rather do a job where I can work alone, rather do a job where I have to work with others",
             "Working in a group is better than working alone"
         ],
-        # UPDATED MATRIX (Q13) - Fill with your exact Qualtrics Q13 statements
+        # UPDATED MATRIX (Q13) - **VERIFY THESE WITH YOUR QUALTRICS SURVEY**
         "Please rate each statement regarding Artificial Intelligence (AI) - Trust and Reliance": [ 
-            "I believe AI systems are generally reliable.", 
-            "I would trust an AI to provide accurate information.",
-            "I feel comfortable relying on AI for important tasks.",
-            "I am confident in decisions made with AI assistance.",
-            "I think AI can be a valuable partner in creative work."
+            "Generally I would trust AI",
+            "AI can help me solve many problems",
+            "I think it is a good idea to rely on AI for help",
+            "I may not trust information I get from AI",
+            "AI is reliable",
+            "I would rely on AI"
         ],
-        # NEW MATRIX (Q14) - Fill with your exact Qualtrics Q14 statements
+        # NEW MATRIX (Q14) - **VERIFY THESE WITH YOUR QUALTRICS SURVEY**
         "Please rate each statement regarding Artificial Intelligence (AI) - Perceived Creativity": [
             "AI systems can be truly creative.",
             "AI can generate novel and innovative ideas.",
@@ -286,6 +327,7 @@ def personality_and_ai_survey_page():
         for section, questions in matrix_questions.items():
             st.subheader(section)
             
+            # Header for Likert scale options
             header_cols = st.columns([3, 5])
             with header_cols[1]:
                 sub_cols = st.columns(len(likert_options))
@@ -299,21 +341,19 @@ def personality_and_ai_survey_page():
                 with row_cols[0]:
                     st.write(stmt)
                 with row_cols[1]:
-                    # Initialize with a unique default that we can check against
+                    # Use a unique default value for validation
                     default_selection = "NOT_SELECTED" 
-                    responses[stmt] = st.radio(
+                    selected_value = st.radio(
                         label=stmt, 
-                        options=likert_options + [default_selection], # Add a default option that isn't visible but helps validation
-                        index=len(likert_options), # Select the default option initially
-                        key=f"personality_{stmt.replace(' ', '_').replace('.', '')}", # Ensure unique key
+                        options=likert_options + [default_selection], 
+                        index=len(likert_options), # Select the invisible default initially
+                        key=f"personality_{stmt.replace(' ', '_').replace('.', '').replace('?', '').replace(':', '')}", # Ensure unique key
                         horizontal=True,
                         label_visibility="collapsed"
                     )
-                    if responses[stmt] == default_selection:
+                    if selected_value == default_selection:
                         all_questions_answered = False
-                    else:
-                        # Store the actual selected value
-                        pass 
+                    responses[stmt] = selected_value # Store the selected value
             st.markdown("---")
 
         submitted = st.form_submit_button("Next")
@@ -321,11 +361,11 @@ def personality_and_ai_survey_page():
             if not all_questions_answered:
                 st.error("Please answer all questions before proceeding.")
             elif responses["If you're reading this carefully, select 'Somewhat Agree'."] != "Somewhat Agree":
-                st.error("Attention check failed. Please review your answers carefully.")
+                st.error("Attention check failed. Please review your answers carefully and select 'Somewhat Agree' for the attention check question.")
             else:
                 # Remove the internal default selection if it was passed through
                 for key in list(responses.keys()):
-                    if responses[key] == "NOT_SELECTED":
+                    if responses[key] == default_selection: # Should not happen if validation passes
                         del responses[key] 
 
                 st.session_state.survey_responses.update(responses)
@@ -333,7 +373,7 @@ def personality_and_ai_survey_page():
                 st.rerun()
 
 # ------------------------
-# Page 3: Instructions (Now Page 2)
+# Page 3: Instructions
 # ------------------------
 def page2():
     st.title("Instructions")
@@ -344,11 +384,11 @@ def page2():
         - **Goal:** After the brainstorming session concludes, you will be asked to write a short summary of your discussion.
     """)
     # Using the next_button helper
-    next_button(current_page=2, next_page=4, label="Start Brainstorming", key="start_brainstorming_btn")
+    next_button(current_page=3, next_page=4, label="Start Brainstorming", key="start_brainstorming_btn")
 
 
 # ------------------------
-# Page 4: Chat Interface (Now Page 3)
+# Page 4: Chat Interface 
 # ------------------------
 def page3():
     st.title("Brainstorm with Your Teammate")
@@ -373,7 +413,7 @@ def page3():
     chat_limit_reached = st.session_state.user_turns >= 10
     
     if chat_limit_reached:
-        st.info("Brainstorming session complete! Please review the final story and click 'Next' to continue.")
+       st.info("Brainstorming session complete! Please review the final story and click 'Next' to continue.")
 
     # Get user input, disable if limit is reached
     user_input = st.chat_input("Your message...", disabled=chat_limit_reached, key="chat_input_text")
@@ -393,17 +433,18 @@ def page3():
                 except Exception as e:
                     st.error(f"An error occurred with the API call: {e}")
         else:
-            st.error("API client not initialized. Cannot generate AI response.")
+            st.error("API client not initialized. Cannot generate AI response. Please ensure OPENAI_API_KEY is set in Streamlit secrets.")
 
         st.rerun()
 
     # Navigation to the next page
     if st.session_state.user_turns >= 10: # Only show "Next" button after 10 turns
+        # Using the next_button helper
         next_button(current_page=4, next_page=5, label="Next: Write Summary", key="go_to_summary_btn")
 
 
 # ------------------------
-# Page 5: Summary (Now Page 4)
+# Page 5: Summary
 # ------------------------
 def page4():
     st.title("Summary")
@@ -417,11 +458,12 @@ def page4():
             st.rerun()
 
 # ------------------------
-# Page 6: Post-Task Feedback (Now Page 5)
+# Page 6: Post-Task Feedback
 # ------------------------
 def feedback_page():
     st.title("Post-Task Feedback")
 
+    # Custom CSS for horizontal radio buttons and hiding labels
     st.markdown("""
         <style>
             div.row-widget.stRadio > div {
@@ -469,6 +511,7 @@ def feedback_page():
         for section, questions in matrix_questions.items():
             st.subheader(section)
             
+            # Header for Likert scale options
             header_cols = st.columns([3, 5])
             with header_cols[1]:
                 sub_cols = st.columns(len(likert_options))
@@ -484,19 +527,19 @@ def feedback_page():
                     st.write(stmt)
                 
                 with row_cols[1]:
+                    # Use a unique default value for validation
                     default_selection = "NOT_SELECTED" 
-                    responses[stmt] = st.radio(
+                    selected_value = st.radio(
                         label=stmt, 
                         options=likert_options + [default_selection], 
-                        index=len(likert_options),
-                        key=f"fb_{stmt.replace(' ', '_').replace('.', '')}", # Ensure unique key
+                        index=len(likert_options), # Select the invisible default initially
+                        key=f"fb_{stmt.replace(' ', '_').replace('.', '').replace('?', '').replace(':', '')}", # Ensure unique key
                         horizontal=True,
                         label_visibility="collapsed"
                     )
-                    if responses[stmt] == default_selection:
+                    if selected_value == default_selection:
                         all_feedback_answered = False
-                    else:
-                        pass
+                    responses[stmt] = selected_value # Store the selected value
             st.markdown("---")
 
         st.subheader("Post-Task Emotional State (SAM)")
@@ -521,8 +564,9 @@ def feedback_page():
             if not all_feedback_answered:
                 st.error("Please answer all feedback questions before proceeding.")
             else:
+                # Remove the internal default selection if it was passed through
                 for key in list(responses.keys()):
-                    if responses[key] == "NOT_SELECTED":
+                    if responses[key] == default_selection: # Should not happen if validation passes
                         del responses[key] 
 
                 st.session_state.feedback_responses = responses
@@ -531,7 +575,7 @@ def feedback_page():
                 st.rerun()
 
 # ------------------------
-# Page 7: Acknowledgement (Now Page 6 - Final Page)
+# Page 7: Acknowledgement (Final Page)
 # ------------------------
 def page5():
     st.title("Thank You!")
