@@ -271,26 +271,24 @@ def personality_and_ai_survey_page():
             div.stRadio > label > div[data-testid="stDecoration"] {
                 width: 15px;
                 height: 15px;
-                margin-right: 0px; /* No margin here, padding comes from label */
+                margin-right: 0px; /* No horizontal margin for circle */
                 margin-bottom: 5px; /* Space between circle and label text */
             }
 
-            /* Adjust the label container for each radio option */
-            div.stRadio > label {
-                flex-direction: column; /* Stack circle and label vertically */
-                align-items: center; /* Center horizontally within its space */
-                text-align: center; /* Center text */
-                padding: 0px 2px; /* Small padding around each option */
-            }
-            
-            /* Adjust the text within the radio button label */
+            /* HIDE THE LABEL TEXT FOR INDIVIDUAL RADIO OPTIONS */
             div.stRadio p {
-                font-size: 0.75em; /* Smaller font for options to fit better */
-                line-height: 1.1; 
-                white-space: normal !important; /* Allow wrapping */
-                word-break: break-word; /* Allow long words to break */
+                display: none !important; 
             }
 
+            /* Adjust the label container for each radio option - only the circle is seen */
+            div.stRadio > label {
+                flex-direction: column; /* Stack circle and (hidden) label vertically */
+                align-items: center; /* Center horizontally within its space */
+                text-align: center; /* Center (hidden) text */
+                padding: 0px 2px; /* Small padding around each option */
+                min-width: 0; /* Allow columns to shrink */
+            }
+            
             /* Specific alignment for matrix headers */
             .matrix-header-text {
                 text-align: center; 
@@ -530,14 +528,6 @@ def feedback_page():
     st.markdown("""
         <style>
             /* Make the actual radio button circle smaller */
-            div.stRadio > label {
-                flex-direction: column; /* Stack circle and label vertically */
-                align-items: center; /* Center horizontally within its space */
-                text-align: center; /* Center text */
-                padding: 0px 2px; /* Small padding around each option */
-            }
-
-            /* Make radio button circles smaller */
             div.stRadio > label > div[data-testid="stDecoration"] {
                 width: 15px;
                 height: 15px;
@@ -545,14 +535,20 @@ def feedback_page():
                 margin-bottom: 5px; /* Space between circle and label text */
             }
 
-            /* Adjust the text within the radio button label */
+            /* HIDE THE LABEL TEXT FOR INDIVIDUAL RADIO OPTIONS */
             div.stRadio p {
-                font-size: 0.75em; /* Smaller font for options to fit better */
-                line-height: 1.1; 
-                white-space: normal !important; /* Allow wrapping */
-                word-break: break-word; /* Allow long words to break */
+                display: none !important; 
             }
 
+            /* Adjust the label container for each radio option - only the circle is seen */
+            div.stRadio > label {
+                flex-direction: column; /* Stack circle and (hidden) label vertically */
+                align-items: center; /* Center horizontally within its space */
+                text-align: center; /* Center (hidden) text */
+                padding: 0px 2px; /* Small padding around each option */
+                min-width: 0; /* Allow columns to shrink */
+            }
+            
             /* Specific alignment for matrix headers */
             .matrix-header-text {
                 text-align: center; 
