@@ -280,9 +280,9 @@ def personality_and_ai_survey_page():
                 display: flex; /* Use flexbox to center the circle */
                 align-items: center; /* Center horizontally */
                 justify-content: center; /* Center vertically */
-                /* NEW: More precise positioning */
-                position: relative; 
-                left: 0px; /* Adjust this value (e.g., -2px, 5px) to shift the circle horizontally */
+                /* NEW: More precise positioning using transform */
+                position: relative;
+                transform: translateX(0px); /* Adjust this value (e.g., -2px, 5px) to shift the circle horizontally */
             }
 
             /* Adjust the label container for each radio option - only the circle is seen */
@@ -551,9 +551,9 @@ def feedback_page():
                 display: flex; /* Use flexbox to center the circle */
                 align-items: center; /* Center horizontally */
                 justify-content: center; /* Center vertically */
-                /* NEW: More precise positioning */
+                /* NEW: More precise positioning using transform */
                 position: relative; 
-                left: 0px; /* Adjust this value (e.g., -2px, 5px) to shift the circle horizontally */
+                transform: translateX(0px); /* Adjust this value (e.g., -2px, 5px) to shift the circle horizontally */
             }
 
             /* Adjust the label container for each radio option - only the circle is seen */
