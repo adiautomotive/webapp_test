@@ -396,7 +396,7 @@ def personality_and_ai_survey_page():
 
             for stmt_idx, stmt in enumerate(questions):
                 # Create columns for each statement row: one for the question, then one for the radio group
-                # The second column's width should be the sum of all individual option widths
+                # This ensures the question text and the radio buttons align with the headers
                 question_col, options_col = st.columns([2.5, sum([1] * len(likert_options))]) 
                 
                 with question_col:
@@ -408,9 +408,9 @@ def personality_and_ai_survey_page():
 
                     selected_value = st.radio(
                         label=stmt, # Label for this group. It's hidden by CSS.
-                        options=likert_options, # All Likert options for this single radio group
+                        options=likert_options, 
                         index=None, # Start with no option selected
-                        key=radio_key, # Unique key for this radio group (allows value retrieval via st.session_state[key])
+                        key=radio_key, # Unique key for this radio group
                         horizontal=True, # Display options horizontally
                         label_visibility="collapsed" # Hide the label, as statement is in first column
                     )
