@@ -274,26 +274,27 @@ def personality_and_ai_survey_page():
 
             /* Size and position of the actual radio circle */
             div.stRadio > label > div[data-testid="stDecoration"] {
-                width: 18px; /* Make circle slightly larger for visibility */
+                width: 18px; 
                 height: 18px;
-                margin: 0px; /* Remove all margins */
-                display: flex; /* Use flexbox to center the circle */
-                align-items: center; /* Center horizontally */
-                justify-content: center; /* Center vertically */
-                /* NEW: More precise positioning using transform */
+                margin: 0px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                /* NEW: Try to explicitly center it within its direct container */
                 position: relative;
-                transform: translateX(0px); /* Adjust this value (e.g., -2px, 5px) to shift the circle horizontally */
+                left: 50%; /* Start from the middle of its parent label */
+                transform: translateX(-50%); /* Shift back by half its own width */
             }
 
             /* Adjust the label container for each radio option - only the circle is seen */
             div.stRadio > label {
-                flex-direction: row; /* Keep circle and hidden label horizontal */
-                align-items: center; /* Vertically center the circle within its allocated space */
-                justify-content: center; /* Horizontally center the circle within its allocated space */
-                padding: 0px; /* No padding on the label itself */
-                margin: 0px; /* No margin on the label itself */
-                height: 100%; /* Take full height of column for centering */
-                width: 100%; /* Take full width of column for centering */
+                flex-direction: row; 
+                align-items: center; 
+                justify-content: center; /* Horizontally center the label content */
+                padding: 0px; 
+                margin: 0px; 
+                height: 100%; 
+                width: 100%; 
             }
             
             /* Specific alignment for matrix headers */
@@ -302,37 +303,36 @@ def personality_and_ai_survey_page():
                 font-weight: bold; 
                 padding: 0px; 
                 margin: 0px; 
-                font-size: 0.8em; /* Header font size */
-                white-space: normal !important; /* Allow headers to wrap if needed */
+                font-size: 0.8em; 
+                white-space: normal !important; 
                 overflow: visible; 
                 text-overflow: clip; 
             }
             .matrix-row-question {
                 display: flex;
-                align-items: center; /* Vertically center question text */
-                min-height: 60px; /* Ensure enough height for question row */
+                align-items: center; 
+                min-height: 60px; 
                 padding-right: 5px; 
             }
             /* Reduce gap between columns if necessary */
             .stColumns > div {
-                gap: 0.1rem; /* Even smaller gap between columns for tighter matrix */
+                gap: 0.1rem; 
             }
             /* Ensure the stRadio container takes up all available column width */
             .stForm .stRadio {
                 width: 100%;
             }
             /* This is crucial for horizontal distribution of options within the st.radio */
-            /* Target the internal container of horizontal radios */
             div[data-testid="stHorizontalRadio"] {
-                display: flex; /* Use flexbox */
-                flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
+                display: flex; 
+                flex-wrap: nowrap; 
                 justify-content: space-around; /* Distribute items evenly */
-                align-items: center; /* Align items vertically (circles) */
-                width: 100%; /* Take full width of its parent column */
+                align-items: center; 
+                width: 100%; 
             }
             /* Ensure individual radio options don't have extra margins */
             div[data-testid="stHorizontalRadio"] > label {
-                margin: 0px !important; /* Remove all margins */
+                margin: 0px !important; 
                 flex-grow: 1; /* Allow labels to grow and fill space */
             }
         </style>
@@ -636,7 +636,7 @@ def feedback_page():
         responses = {}
         all_feedback_answered = True
         
-        for section_idx, (section, questions) in enumerate(matrix_questions.items()):
+        for section_idx, (section, questions) -> Tuple[int, str, List[str]] in enumerate(matrix_questions.items()):
             st.subheader(section)
             
             # Create columns for the header row: one for the question, then one for each Likert option
