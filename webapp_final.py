@@ -93,8 +93,6 @@ def save_chat_to_file():
     file_path = os.path.join(CHAT_LOGS_FOLDER, filename)
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
-    # st.success(f"Data saved to {file_path}") # Removed for cleaner UX on final page
-
 
 # ------------------------
 # Page 0: Welcome Page with Consent
@@ -168,7 +166,6 @@ def welcome_page():
                     st.rerun()
                 else:
                     st.error("Incorrect password")
-
 
 # ------------------------
 # Page 1: Pre-Activity Survey
@@ -269,89 +266,58 @@ def personality_and_ai_survey_page():
         <style>
             /* HIDE THE LABEL TEXT FOR INDIVIDUAL RADIO OPTIONS */
             div.stRadio p {
-                display: none !important; 
+                display: none !important;
             }
 
-            /* Size and position of the actual radio circle */
-            div.stRadio > label > div[data-testid="stDecoration"] {
-                width: 18px; /* Make circle slightly larger for visibility */
-                height: 18px;
-                margin: 0px; /* Remove all margins */
-                display: flex; /* Use flexbox to center the circle */
-                align-items: center; /* Center horizontally */
-                justify-content: center; /* Center vertically */
-                
-                /* CRITICAL: Adjust this transform value to nudge the circles */
-                /* Experiment with small positive or negative pixel values (e.g., -2px, 2px, 0px) */
-                transform: translateX(0px); /* Start at 0, adjust as needed */
+            /* THIS IS THE KEY PART FOR ALIGNMENT */
+            /* Target the container for a horizontal radio group */
+            div[data-testid="stHorizontalRadio"] {
+                display: flex;
+                justify-content: space-around; /* Distribute buttons evenly */
+                align-items: center;
+                width: 100%; /* Ensure it takes the full width of its column */
             }
 
-            /* Adjust the label container for each radio option - only the circle is seen */
-            div.stRadio > label {
-                flex-direction: row; /* Keep circle and hidden label horizontal */
-                align-items: center; /* Vertically center the circle within its allocated space */
-                justify-content: center; /* Horizontally center the circle within its allocated space */
-                padding: 0px; /* No padding on the label itself */
-                margin: 0px; /* No margin on the label itself */
-                height: 100%; /* Take full height of column for centering */
-                width: 100%; /* Take full width of column for centering */
+            /* Target the label that WRAPS each radio button */
+            div[data-testid="stHorizontalRadio"] > label {
+                display: flex;
+                justify-content: center; /* Center the circle within the label's space */
+                align-items: center;
+                margin: 0 !important;
+                flex-grow: 1; /* Allow each option to take up equal space */
             }
-            
-            /* Specific alignment for matrix headers */
+
+            /* Style the header text */
             .matrix-header-text {
-                text-align: center; 
-                font-weight: bold; 
-                padding: 0px; 
-                margin: 0px; 
-                font-size: 0.8em; /* Header font size */
-                white-space: normal !important; /* Allow headers to wrap if needed */
-                overflow: visible; 
-                text-overflow: clip; 
+                text-align: center;
+                font-weight: bold;
+                font-size: 0.8em;
+                white-space: normal !important;
             }
+
+            /* Style the question text on the left */
             .matrix-row-question {
                 display: flex;
-                align-items: center; /* Vertically center question text */
-                min-height: 60px; /* Ensure enough height for question row */
-                padding-right: 5px; 
+                align-items: center;
+                min-height: 60px; /* Give rows consistent height */
+                padding-right: 5px;
             }
-            /* Reduce gap between columns if necessary */
-            .stColumns > div {
-                gap: 0.1rem; /* Even smaller gap between columns for tighter matrix */
-            }
-            /* Ensure the stRadio container takes up all available column width */
-            .stForm .stRadio {
-                width: 100%;
-            }
-            /* This is crucial for horizontal distribution of options within the st.radio */
-            div[data-testid="stHorizontalRadio"] {
-                display: flex; /* Use flexbox */
-                flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                justify-content: space-around; /* Distribute items evenly */
-                align-items: center; /* Align items vertically (circles) */
-                width: 100%; /* Take full width of its parent column */
-            }
-            /* Ensure individual radio options don't have extra margins */
-            div[data-testid="stHorizontalRadio"] > label {
-                margin: 0px !important; /* Remove all margins */
-                flex-grow: 1; /* Allow labels to grow and fill space */
+
+            /* Reduce the gap between the columns in the matrix */
+            .stColumns > div[data-testid="stVerticalBlock"] {
+                gap: 0.2rem;
             }
         </style>
     """, unsafe_allow_html=True)
 
     likert_options = ["Strongly Disagree", "Somewhat Disagree", "Neither Agree or Disagree", "Somewhat Agree", "Strongly Agree"]
-    
+
     matrix_questions = {
         "Please rate the following statement: I see myself as someone who...": [
-            "is reserved",
-            "is generally trusting",
-            "tends to be lazy",
-            "is relaxed, handles stress well",
-            "has few artistic interests",
-            "is outgoing, sociable",
-            "tends to find faults with others",
-            "does a thorough job",
-            # ATTENTION CHECK HERE (Block 2, Question 11, after "does a thorough job")
-            "If you're reading this carefully, select 'Somewhat Agree'.", 
+            "is reserved", "is generally trusting", "tends to be lazy",
+            "is relaxed, handles stress well", "has few artistic interests",
+            "is outgoing, sociable", "tends to find faults with others", "does a thorough job",
+            "If you're reading this carefully, select 'Somewhat Agree'.",
             "gets nervous easily"
         ],
         "Work Style Preference": [
@@ -359,67 +325,58 @@ def personality_and_ai_survey_page():
             "If given a choice: I would rather do a job where I can work alone, rather do a job where I have to work with others",
             "Working in a group is better than working alone"
         ],
-        # UPDATED MATRIX (Q13) - VERIFY THESE WITH YOUR QUALTRICS SURVEY
-        "Please rate each statement regarding Artificial Intelligence (AI) - Trust and Reliance": [ 
-            "Generally I would trust AI",
-            "AI can help me solve many problems",
+        "Please rate each statement regarding Artificial Intelligence (AI) - Trust and Reliance": [
+            "Generally I would trust AI", "AI can help me solve many problems",
             "I think it is a good idea to rely on AI for help",
-            "I may not trust information I get from AI",
-            "AI is reliable",
-            "I would rely on AI"
+            "I may not trust information I get from AI", "AI is reliable", "I would rely on AI"
         ],
-        # NEW MATRIX (Q14) - VERIFY THESE WITH YOUR QUALTRICS SURVEY
         "Please rate each statement regarding Artificial Intelligence (AI) - Perceived Creativity": [
-            "AI systems can be truly creative.",
-            "AI can generate novel and innovative ideas.",
+            "AI systems can be truly creative.", "AI can generate novel and innovative ideas.",
             "AI can understand and express emotions in a creative context.",
             "Collaborating with AI can enhance my own creativity.",
             "AI can contribute original content to a creative project."
         ]
     }
-    
+
     with st.form("personality_survey_form"):
         responses = {}
         all_questions_answered = True
-        
+
         for section_idx, (section, questions) in enumerate(matrix_questions.items()):
             st.subheader(section)
+
+            # Define column ratios
+            col_ratios = [2.5] + [1] * len(likert_options)
             
-            # Create columns for the header row: one for the question, then one for each Likert option
-            # Adjusted column width ratios for better horizontal spacing of headers
-            # [2.5] for question text, [1] for each of 5 Likert options
-            header_cols = st.columns([2.5] + [1] * len(likert_options)) 
-            
+            # --- HEADER ROW ---
+            header_cols = st.columns(col_ratios)
             with header_cols[0]:
-                st.write("") # Empty cell for alignment with question column
+                st.write("") # Empty cell for alignment
             for i, option in enumerate(likert_options):
                 with header_cols[i + 1]:
                     st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
             st.divider()
 
+            # --- QUESTION ROWS ---
             for stmt_idx, stmt in enumerate(questions):
-                # Create columns for each statement row: one for the question, then one for the radio group
-                # This ensures the question text and the radio buttons align with the headers
-                question_col, options_col = st.columns([2.5, sum([1] * len(likert_options))]) 
-                
-                with question_col:
-                    st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
-                
-                with options_col: # This column will contain the single st.radio widget for the row
-                    # Key for this specific st.radio widget. It's unique for each statement.
-                    radio_key = f"personality_sec{section_idx}_stmt{stmt_idx}"
+                # Use one column for the question and another that spans the options for the radio group
+                q_col, r_col = st.columns(col_ratios)
 
+                with q_col:
+                    st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
+
+                with r_col:
+                    radio_key = f"personality_sec{section_idx}_stmt{stmt_idx}"
                     selected_value = st.radio(
-                        label=stmt, # Label for this group. It's hidden by CSS.
-                        options=likert_options, 
-                        index=None, # Start with no option selected
-                        key=radio_key, # Unique key for this radio group
-                        horizontal=True, # Display options horizontally
-                        label_visibility="collapsed" # Hide the label, as statement is in first column
+                        label=stmt, # Hidden label
+                        options=likert_options,
+                        index=None,
+                        key=radio_key,
+                        horizontal=True,
+                        label_visibility="collapsed"
                     )
-                    
-                    responses[stmt] = selected_value # Store the selected value
-                    if selected_value is None: # Check if a selection was made
+                    responses[stmt] = selected_value
+                    if selected_value is None:
                         all_questions_answered = False
             st.markdown("---")
 
@@ -434,6 +391,7 @@ def personality_and_ai_survey_page():
                 st.session_state.page = 3
                 st.rerun()
 
+
 # ------------------------
 # Page 3: Instructions
 # ------------------------
@@ -444,7 +402,7 @@ def page2():
         Starting tomorrow, all humans can fly. How would that change cities, society, and daily life? That’s what we’re here to explore.
         - **Your Task:** Brainstorm ideas back and forth with an AI assistant for a limited number of turns.
         - **Goal:** After the brainstorming session concludes, you will be asked to write a short summary of your discussion.
-    """)
+        """)
     # Using the next_button helper
     next_button(current_page=3, next_page=4, label="Start Brainstorming", key="start_brainstorming_btn")
 
@@ -540,70 +498,46 @@ def feedback_page():
         <style>
             /* HIDE THE LABEL TEXT FOR INDIVIDUAL RADIO OPTIONS */
             div.stRadio p {
-                display: none !important; 
+                display: none !important;
             }
 
-            /* Size and position of the actual radio circle */
-            div.stRadio > label > div[data-testid="stDecoration"] {
-                width: 18px; /* Make circle slightly larger for visibility */
-                height: 18px;
-                margin: 0px; /* Remove all margins */
-                display: flex; /* Use flexbox to center the circle */
-                align-items: center; /* Center horizontally */
-                justify-content: center; /* Center vertically */
-                /* NEW: More precise positioning using transform */
-                position: relative; 
-                transform: translateX(0px); /* Adjust this value (e.g., -2px, 5px) to shift the circle horizontally */
+            /* THIS IS THE KEY PART FOR ALIGNMENT */
+            /* Target the container for a horizontal radio group */
+            div[data-testid="stHorizontalRadio"] {
+                display: flex;
+                justify-content: space-around; /* Distribute buttons evenly */
+                align-items: center;
+                width: 100%; /* Ensure it takes the full width of its column */
             }
 
-            /* Adjust the label container for each radio option - only the circle is seen */
-            div.stRadio > label {
-                flex-direction: row; /* Keep circle and hidden label horizontal */
-                align-items: center; /* Vertically center the circle within its allocated space */
-                justify-content: center; /* Horizontally center the circle within its allocated space */
-                padding: 0px; /* No padding on the label itself */
-                margin: 0px; /* No margin on the label itself */
-                height: 100%; /* Take full height of column for centering */
-                width: 100%; /* Take full width of column for centering */
+            /* Target the label that WRAPS each radio button */
+            div[data-testid="stHorizontalRadio"] > label {
+                display: flex;
+                justify-content: center; /* Center the circle within the label's space */
+                align-items: center;
+                margin: 0 !important;
+                flex-grow: 1; /* Allow each option to take up equal space */
             }
-            
-            /* Specific alignment for matrix headers */
+
+            /* Style the header text */
             .matrix-header-text {
-                text-align: center; 
-                font-weight: bold; 
-                padding: 0px; 
-                margin: 0px; 
-                font-size: 0.85em; /* Header font size */
-                white-space: normal !important; /* Allow headers to wrap if needed */
-                overflow: visible; 
-                text-overflow: clip; 
+                text-align: center;
+                font-weight: bold;
+                font-size: 0.8em;
+                white-space: normal !important;
             }
+
+            /* Style the question text on the left */
             .matrix-row-question {
                 display: flex;
-                align-items: center; /* Vertically center question text */
-                min-height: 60px; /* Ensure enough height for question row */
-                padding-right: 5px; 
+                align-items: center;
+                min-height: 60px; /* Give rows consistent height */
+                padding-right: 5px;
             }
-            /* Reduce gap between columns if necessary */
-            .stColumns > div {
-                gap: 0.1rem; /* Even smaller gap between columns for tighter matrix */
-            }
-            /* Ensure the stRadio container takes up all available column width */
-            .stForm .stRadio {
-                width: 100%;
-            }
-            /* This is crucial for horizontal distribution of options within the st.radio */
-            div[data-testid="stHorizontalRadio"] {
-                display: flex; /* Use flexbox */
-                flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                justify-content: space-around; /* Distribute items evenly */
-                align-items: center; /* Align items vertically (circles) */
-                width: 100%; /* Take full width of its parent column */
-            }
-            /* Ensure individual radio options don't have extra margins */
-            div[data-testid="stHorizontalRadio"] > label {
-                margin: 0px !important; /* Remove all margins */
-                flex-grow: 1; /* Allow labels to grow and fill space */
+
+            /* Reduce the gap between the columns in the matrix */
+            .stColumns > div[data-testid="stVerticalBlock"] {
+                gap: 0.2rem;
             }
         </style>
     """, unsafe_allow_html=True)
@@ -639,37 +573,38 @@ def feedback_page():
         for section_idx, (section, questions) in enumerate(matrix_questions.items()):
             st.subheader(section)
             
-            # Create columns for the header row: one for the question, then one for each Likert option
-            header_cols = st.columns([2.5] + [1] * len(likert_options))
+            # Define column ratios
+            col_ratios = [2.5] + [1] * len(likert_options)
             
+            # --- HEADER ROW ---
+            header_cols = st.columns(col_ratios)
             with header_cols[0]:
-                st.write("") # Empty cell for alignment with question column
+                st.write("") # Empty cell
             for i, option in enumerate(likert_options):
                 with header_cols[i + 1]:
                     st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
             st.divider()
 
+            # --- QUESTION ROWS ---
             for stmt_idx, stmt in enumerate(questions):
-                # Create columns for each statement row
-                question_col, options_col = st.columns([2.5, sum([1] * len(likert_options))])
+                q_col, r_col = st.columns(col_ratios)
                 
-                with question_col:
+                with q_col:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
                 
-                with options_col: # This column will contain the single st.radio widget for the row
+                with r_col:
                     radio_key = f"feedback_sec{section_idx}_stmt{stmt_idx}"
-
                     selected_value = st.radio(
-                        label=stmt, # Label for this group, hidden
+                        label=stmt, # Hidden label
                         options=likert_options, 
-                        index=None, # Start with no option selected
-                        key=radio_key, # Unique key for this radio group
-                        horizontal=True, # Display options horizontally
-                        label_visibility="collapsed" # Hide the label, as statement is in first column
+                        index=None,
+                        key=radio_key,
+                        horizontal=True,
+                        label_visibility="collapsed"
                     )
                 
-                responses[stmt] = selected_value # Store the selected value
-                if selected_value is None: # Check if a selection was made
+                responses[stmt] = selected_value
+                if selected_value is None:
                     all_feedback_answered = False
             st.markdown("---")
 
@@ -707,7 +642,6 @@ def page5():
     st.title("Thank You!")
     st.markdown("Thank you for completing the survey, now you may close this window.")
     st.balloons()
-    # Removed restart_button() as requested
 
 # ------------------------
 # Helper for Admin Page: Convert data to CSV
@@ -776,7 +710,6 @@ def admin_view():
 
     if not all_files:
         st.warning("No submission files found.")
-        # Removed restart_button from here for consistency, admin can refresh browser.
         return
 
     # Load all data from JSON files
@@ -824,7 +757,7 @@ def admin_view():
             prolific_id = entry.get('prolific_id', 'N/A')
             timestamp = entry.get('timestamp', 'N/A')
             
-            with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
+            with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
                 st.markdown(f"**Filename:** `{entry.get('filename')}`")
                 
                 # Display Survey Responses
