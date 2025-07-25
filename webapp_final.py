@@ -264,54 +264,55 @@ def survey_page():
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
-    # Custom CSS for horizontal radio buttons and improved alignment
+    # Custom CSS for matrix alignment and radio button appearance
     st.markdown("""
         <style>
-            /* Make radio button circles smaller and adjust padding */
+            /* General container for each radio option */
+            div.stRadio > label {
+                flex-direction: column; /* Stack circle and label vertically */
+                align-items: center; /* Center horizontally */
+                text-align: center; /* Center text */
+                padding: 0px 2px; /* Small padding around each option */
+                margin: 0px; /* Remove default margin */
+            }
+
+            /* Make radio button circles smaller */
             div.stRadio > label > div[data-testid="stDecoration"] {
                 width: 15px;
                 height: 15px;
-                margin-right: 2px; /* Reduce space after radio circle */
+                margin-right: 0px; /* No horizontal margin for circle */
+                margin-bottom: 5px; /* Space between circle and label text */
             }
-            div.stRadio > label {
-                padding: 0px; /* Remove padding around each radio option */
-                margin: 0px; /* Remove margin */
-            }
-            /* Ensure the text label for each individual radio button does not wrap */
+
+            /* Adjust the size and wrapping of the text within the radio button label */
             div.stRadio p {
-                font-size: 0.75em; /* Further slightly smaller font for options to fit better */
-                line-height: 1.0; /* Adjust line height if necessary */
-                white-space: nowrap !important; /* Ensure the option text itself doesn't wrap */
+                font-size: 0.7em; /* Even smaller font for options to prevent wrapping */
+                line-height: 1.1; 
+                white-space: normal !important; /* Allow wrapping within a tiny column */
+                word-break: break-word; /* Allow long words to break */
             }
 
             /* Specific alignment for matrix headers */
             .matrix-header-text {
                 text-align: center; 
                 font-weight: bold; 
-                padding: 0px; /* Remove padding to control spacing via columns */
-                margin: 0px; /* Remove margin */
+                padding: 0px; 
+                margin: 0px; 
                 font-size: 0.8em; /* Slightly smaller font for headers */
-                white-space: nowrap !important; /* Prevent header text wrapping */
-                overflow: hidden; /* Hide overflow if text is still too long */
-                text-overflow: ellipsis; /* Add ellipsis if text is cut */
+                white-space: normal !important; /* Allow headers to wrap if needed */
+                overflow: visible; /* Ensure text is visible */
+                text-overflow: clip; /* Prevent ellipsis for headers */
             }
             .matrix-row-question {
                 display: flex;
                 align-items: center; /* Vertically center question text */
-                min-height: 60px; /* Ensure enough height for question row to prevent overlap */
-                padding-right: 5px; /* Add some padding to the right of the question */
+                min-height: 60px; /* Ensure enough height for question row */
+                padding-right: 5px; 
             }
-            /* Reduce space between radio options in the horizontal group */
-            div[data-testid="stHorizontalRadio"] {
-                gap: 0px !important; /* Adjust this value if you need more/less spacing between radio options */
-                justify-content: space-between; /* Distribute options across the available space */
+            /* Reduce gap between columns if necessary */
+            .stColumns > div {
+                gap: 0.25rem; /* Reduced gap between columns */
             }
-
-            /* Ensure the stRadio container takes up all available column width */
-            .stForm .stRadio {
-                width: 100%;
-            }
-
         </style>
     """, unsafe_allow_html=True)
 
@@ -363,8 +364,8 @@ def personality_and_ai_survey_page():
             st.subheader(section)
             
             # Create columns for the header row: one for the question, then one for each Likert option
-            # Adjust column width ratios: 3 for question, 0.7 for each radio option
-            header_cols = st.columns([3] + [0.7] * len(likert_options)) 
+            # Adjust column width ratios to give more space proportionally to text column
+            header_cols = st.columns([2.5] + [1] * len(likert_options)) # Adjust this ratio based on visual check
             
             with header_cols[0]:
                 st.write("") # Empty cell for alignment with question column
@@ -374,25 +375,62 @@ def personality_and_ai_survey_page():
             st.divider()
 
             for stmt_idx, stmt in enumerate(questions):
-                # Create columns for each statement row: one for the question, then one for the radio group
-                # This ensures the question text and the radio buttons align with the headers
-                question_col, options_col = st.columns([3, sum([0.7] * len(likert_options))])
+                # We need to maintain the selected state for each statement across reruns
+                # Store the selected option for this statement in session state
+                current_selection_key = f"selected_option_sec{section_idx}_stmt{stmt_idx}"
+                if current_selection_key not in st.session_state:
+                    st.session_state[current_selection_key] = None # No selection initially
+
+                # Create columns for each statement row: one for the question, then one for EACH individual radio option
+                row_cols = st.columns([2.5] + [1] * len(likert_options)) # Match header column ratios
                 
-                with question_col:
+                with row_cols[0]:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
                 
-                with options_col: # This column will contain the single st.radio widget for the row
-                    selected_value = st.radio(
-                        label=stmt, 
-                        options=likert_options, 
-                        index=None, # No default selected
-                        key=f"section{section_idx}_stmt{stmt_idx}", # Unique key for this question's radio group
-                        horizontal=True, # Display horizontally
-                        label_visibility="collapsed"
-                    )
-                    responses[stmt] = selected_value # Store the selected value
-                    if selected_value is None: # Check if a selection was made
-                        all_questions_answered = False
+                selected_value_for_this_row = st.session_state[current_selection_key]
+                
+                for i, option_text in enumerate(likert_options):
+                    with row_cols[i + 1]:
+                        # Create a single radio button for each option.
+                        # Its value will be the option_text if it's currently selected, None otherwise.
+                        # On click, it updates the session_state for this row.
+                        
+                        # Use a unique key for each radio button instance
+                        unique_radio_key = f"radio_sec{section_idx}_stmt{stmt_idx}_opt{i}"
+                        
+                        # This callback function will run when a radio button is clicked
+                        def update_selection(statement_key, chosen_option):
+                            st.session_state[statement_key] = chosen_option
+                        
+                        # Display the radio button. It is "checked" if its value matches the stored selection.
+                        # Streamlit's st.radio, when given a single option, and index=0 (default)
+                        # effectively acts as a toggle button if its value is managed externally.
+                        
+                        # If the stored value for this row matches this option_text, set it as selected (index=0)
+                        # Otherwise, set it as unselected (index=None for newer Streamlit, or other workaround for older)
+                        is_selected = (selected_value_for_this_row == option_text)
+                        
+                        st.radio(
+                            label=option_text, # Label is the text for this specific option
+                            options=[option_text], # Only this option is available for this radio button
+                            index=0 if is_selected else None, # Set as selected if it matches current_selection_key
+                            key=unique_radio_key,
+                            on_change=update_selection, # Callback to update session state
+                            args=(current_selection_key, option_text), # Args passed to callback
+                            label_visibility="visible", # Make label visible for styling
+                            horizontal=False # Display options vertically if needed, but in its own column
+                        )
+                        # We don't want horizontal=True here for the individual radio, it's just one option.
+                        # The horizontal alignment is managed by st.columns.
+                        
+                # After iterating through all options for this statement,
+                # check if a choice was made for validation
+                if st.session_state[current_selection_key] is None:
+                    all_questions_answered = False
+                
+                # Store the final response for this statement
+                responses[stmt] = st.session_state[current_selection_key]
+
             st.markdown("---")
 
         submitted = st.form_submit_button("Next")
@@ -507,51 +545,54 @@ def page4():
 def feedback_page():
     st.title("Post-Task Feedback")
 
-    # Custom CSS for horizontal radio buttons and improved alignment
+    # Custom CSS for matrix alignment and radio button appearance
     st.markdown("""
         <style>
-            /* Make radio button circles smaller and adjust padding */
+            /* General container for each radio option */
+            div.stRadio > label {
+                flex-direction: column; /* Stack circle and label vertically */
+                align-items: center; /* Center horizontally */
+                text-align: center; /* Center text */
+                padding: 0px 2px; /* Small padding around each option */
+                margin: 0px; /* Remove default margin */
+            }
+
+            /* Make radio button circles smaller */
             div.stRadio > label > div[data-testid="stDecoration"] {
                 width: 15px;
                 height: 15px;
-                margin-right: 2px; /* Reduce space after radio circle */
+                margin-right: 0px; /* No horizontal margin for circle */
+                margin-bottom: 5px; /* Space between circle and label text */
             }
-            div.stRadio > label {
-                padding: 0px; /* Remove padding around each radio option */
-                margin: 0px; /* Remove margin */
-            }
-            /* Ensure the text label for each individual radio button does not wrap */
+
+            /* Adjust the size and wrapping of the text within the radio button label */
             div.stRadio p {
-                font-size: 0.75em; /* Further slightly smaller font for options to fit better */
-                line-height: 1.0; /* Adjust line height if necessary */
-                white-space: nowrap !important; /* Ensure the option text itself doesn't wrap */
+                font-size: 0.75em; /* Even smaller font for options to prevent wrapping */
+                line-height: 1.1; 
+                white-space: normal !important; /* Allow wrapping within a tiny column */
+                word-break: break-word; /* Allow long words to break */
             }
 
             /* Specific alignment for matrix headers */
             .matrix-header-text {
                 text-align: center; 
                 font-weight: bold; 
-                padding: 0px; /* Remove padding to control spacing via columns */
-                margin: 0px; /* Remove margin */
-                font-size: 0.85em; /* Slightly smaller font for headers */
-                white-space: nowrap !important; /* Prevent header text wrapping */
-                overflow: hidden; /* Hide overflow if text is still too long */
-                text-overflow: ellipsis; /* Add ellipsis if text is cut */
+                padding: 0px; 
+                margin: 0px; 
+                font-size: 0.8em; /* Slightly smaller font for headers */
+                white-space: normal !important; /* Allow headers to wrap if needed */
+                overflow: visible; /* Ensure text is visible */
+                text-overflow: clip; /* Prevent ellipsis for headers */
             }
             .matrix-row-question {
                 display: flex;
                 align-items: center; /* Vertically center question text */
-                min-height: 60px; /* Ensure enough height for question row to prevent overlap */
-                padding-right: 5px; /* Add some padding to the right of the question */
+                min-height: 60px; /* Ensure enough height for question row */
+                padding-right: 5px; 
             }
-            /* Reduce space between radio options in the horizontal group */
-            div[data-testid="stHorizontalRadio"] {
-                gap: 0px !important; /* Adjust this value if you need more/less spacing between radio options */
-                justify-content: space-between; /* Distribute options across the available space */
-            }
-            /* Ensure the stRadio container takes up all available column width */
-            .stForm .stRadio {
-                width: 100%;
+            /* Reduce gap between columns if necessary */
+            .stColumns > div {
+                gap: 0.25rem; /* Reduced gap between columns */
             }
         </style>
     """, unsafe_allow_html=True)
@@ -588,7 +629,7 @@ def feedback_page():
             st.subheader(section)
             
             # Create columns for the header row: one for the question, then one for each Likert option
-            header_cols = st.columns([3] + [0.7] * len(likert_options))
+            header_cols = st.columns([2.5] + [1] * len(likert_options))
             
             with header_cols[0]:
                 st.write("") # Empty cell for alignment with question column
@@ -598,24 +639,42 @@ def feedback_page():
             st.divider()
 
             for stmt_idx, stmt in enumerate(questions):
-                # Create columns for each statement row: one for the question, then one for the radio group
-                row_cols = st.columns([3, sum([0.7] * len(likert_options))]) # Combine radio option widths into one column
+                current_selection_key = f"feedback_selected_option_sec{section_idx}_stmt{stmt_idx}"
+                if current_selection_key not in st.session_state:
+                    st.session_state[current_selection_key] = None # No selection initially
+
+                # Create columns for each statement row
+                row_cols = st.columns([2.5] + [1] * len(likert_options))
                 
                 with row_cols[0]:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
                 
-                with row_cols[1]: # This column will contain the single st.radio widget for the row
-                    selected_value = st.radio(
-                        label=stmt, 
-                        options=likert_options, 
-                        index=None, # No default selected
-                        key=f"feedback_section{section_idx}_stmt{stmt_idx}", # Unique key for this question's radio group
-                        horizontal=True, # Display horizontally
-                        label_visibility="collapsed"
-                    )
-                    responses[stmt] = selected_value # Store the selected value
-                    if selected_value is None: # Check if a selection was made
-                        all_feedback_answered = False
+                selected_value_for_this_row = st.session_state[current_selection_key]
+                
+                for i, option_text in enumerate(likert_options):
+                    with row_cols[i + 1]:
+                        unique_radio_key = f"feedback_radio_sec{section_idx}_stmt{stmt_idx}_opt{i}"
+                        
+                        def update_selection_feedback(statement_key, chosen_option):
+                            st.session_state[statement_key] = chosen_option
+
+                        is_selected = (selected_value_for_this_row == option_text)
+                        
+                        st.radio(
+                            label=option_text,
+                            options=[option_text],
+                            index=0 if is_selected else None,
+                            key=unique_radio_key,
+                            on_change=update_selection_feedback,
+                            args=(current_selection_key, option_text),
+                            label_visibility="visible",
+                            horizontal=False
+                        )
+                
+                if st.session_state[current_selection_key] is None:
+                    all_feedback_answered = False
+                
+                responses[stmt] = st.session_state[current_selection_key]
             st.markdown("---")
 
         st.subheader("Post-Task Emotional State (SAM)")
