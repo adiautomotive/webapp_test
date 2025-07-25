@@ -264,7 +264,7 @@ def survey_page():
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
-    # Custom CSS for horizontal radio buttons and hiding labels
+    # Custom CSS for horizontal radio buttons and improved alignment
     st.markdown("""
         <style>
             /* Make radio button circles smaller and adjust padding */
@@ -285,8 +285,9 @@ def personality_and_ai_survey_page():
             }
             /* Adjust the size of the text within the radio button label (e.g., "Strongly Disagree") */
             div.stRadio p {
-                font-size: 0.85em; /* Slightly smaller font for options */
-                line-height: 1.1; /* Adjust line height if necessary */
+                font-size: 0.8em; /* Further slightly smaller font for options to fit better */
+                line-height: 1.0; /* Adjust line height if necessary */
+                white-space: nowrap !important; /* Ensure the option text itself doesn't wrap */
             }
 
             /* Specific alignment for matrix headers */
@@ -295,14 +296,19 @@ def personality_and_ai_survey_page():
                 font-weight: bold; 
                 padding: 0px; /* Remove padding to control spacing via columns */
                 margin: 0px; /* Remove margin */
-                font-size: 0.9em; /* Slightly smaller font for headers */
-                white-space: nowrap; /* Prevent header text wrapping */
+                font-size: 0.85em; /* Slightly smaller font for headers */
+                white-space: nowrap !important; /* Prevent header text wrapping */
             }
             .matrix-row-question {
                 display: flex;
                 align-items: center; /* Vertically center question text */
-                min-height: 50px; /* Ensure enough height for question row */
+                min-height: 55px; /* Ensure enough height for question row to prevent overlap */
                 padding-right: 10px; /* Add some padding to the right of the question */
+            }
+            /* Reduce space between radio options in the horizontal group */
+            div[data-testid="stHorizontalRadio"] {
+                gap: 0px !important; /* Adjust this value if you need more/less spacing between radio options */
+                justify-content: space-between; /* Distribute options across the available space */
             }
         </style>
     """, unsafe_allow_html=True)
@@ -366,28 +372,13 @@ def personality_and_ai_survey_page():
             st.divider()
 
             for stmt_idx, stmt in enumerate(questions):
-                # Create columns for each statement row: one for the question, then one for each radio button
-                row_cols = st.columns([3] + [0.7] * len(likert_options)) # Match header column ratios
+                # Create columns for each statement row: one for the question, then one for the radio group
+                row_cols = st.columns([3, sum([0.7] * len(likert_options))]) # Combine radio option widths into one column
                 
                 with row_cols[0]:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
                 
-                # We will use a unique single radio button in each column
-                # This setup still ensures only one can be selected per 'group' (statement)
-                # because `st.radio` within the same `key` group allows only one selection.
-                # Here, we're relying on the fact that the actual "radio group" behavior
-                # happens when radios share the same `name` attribute in HTML.
-                # Streamlit implicitly groups them by the `label` parameter's underlying ID,
-                # but with `index=None` and separate keys for each, we ensure no default.
-                
-                # To get standard radio behavior (only one selected in a group of 5),
-                # we must use *one* st.radio call per statement with all options.
-                # The previous setup with individual radios per column won't enforce
-                # single selection across the 5 options for one statement.
-                # Let's revert to a single st.radio per question for correctness
-                # and then use CSS to distribute the options horizontally.
-                
-                with row_cols[1]: # This column will contain the single st.radio widget
+                with row_cols[1]: # This column will contain the single st.radio widget for the row
                     selected_value = st.radio(
                         label=stmt, 
                         options=likert_options, 
@@ -513,7 +504,7 @@ def page4():
 def feedback_page():
     st.title("Post-Task Feedback")
 
-    # Custom CSS for horizontal radio buttons and hiding labels
+    # Custom CSS for horizontal radio buttons and improved alignment
     st.markdown("""
         <style>
             /* Make radio button circles smaller and adjust padding */
@@ -534,8 +525,9 @@ def feedback_page():
             }
             /* Adjust the size of the text within the radio button label (e.g., "Strongly Disagree") */
             div.stRadio p {
-                font-size: 0.85em; /* Slightly smaller font for options */
-                line-height: 1.1; /* Adjust line height if necessary */
+                font-size: 0.8em; /* Further slightly smaller font for options to fit better */
+                line-height: 1.0; /* Adjust line height if necessary */
+                white-space: nowrap !important; /* Ensure the option text itself doesn't wrap */
             }
 
             /* Specific alignment for matrix headers */
@@ -544,14 +536,19 @@ def feedback_page():
                 font-weight: bold; 
                 padding: 0px; /* Remove padding to control spacing via columns */
                 margin: 0px; /* Remove margin */
-                font-size: 0.9em; /* Slightly smaller font for headers */
-                white-space: nowrap; /* Prevent header text wrapping */
+                font-size: 0.85em; /* Slightly smaller font for headers */
+                white-space: nowrap !important; /* Prevent header text wrapping */
             }
             .matrix-row-question {
                 display: flex;
                 align-items: center; /* Vertically center question text */
-                min-height: 50px; /* Ensure enough height for question row */
+                min-height: 55px; /* Ensure enough height for question row to prevent overlap */
                 padding-right: 10px; /* Add some padding to the right of the question */
+            }
+            /* Reduce space between radio options in the horizontal group */
+            div[data-testid="stHorizontalRadio"] {
+                gap: 0px !important; /* Adjust this value if you need more/less spacing between radio options */
+                justify-content: space-between; /* Distribute options across the available space */
             }
         </style>
     """, unsafe_allow_html=True)
@@ -598,13 +595,13 @@ def feedback_page():
             st.divider()
 
             for stmt_idx, stmt in enumerate(questions):
-                # Create columns for each statement row: one for the question, then one for each radio button
-                row_cols = st.columns([3] + [0.7] * len(likert_options))
+                # Create columns for each statement row: one for the question, then one for the radio group
+                row_cols = st.columns([3, sum([0.7] * len(likert_options))]) # Combine radio option widths into one column
                 
                 with row_cols[0]:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
                 
-                with row_cols[1]: # This column will contain the single st.radio widget
+                with row_cols[1]: # This column will contain the single st.radio widget for the row
                     selected_value = st.radio(
                         label=stmt, 
                         options=likert_options, 
