@@ -1,3 +1,4 @@
+
 import streamlit as st
 from openai import OpenAI
 import json
@@ -267,7 +268,7 @@ def personality_and_ai_survey_page():
     # Custom CSS for matrix alignment and radio button appearance
     st.markdown("""
         <style>
-            /* General container for each radio option */
+            /* Make radio button circles smaller and adjust padding */
             div.stRadio > label {
                 flex-direction: column; /* Stack circle and label vertically */
                 align-items: center; /* Center horizontally */
@@ -286,7 +287,7 @@ def personality_and_ai_survey_page():
 
             /* Adjust the size and wrapping of the text within the radio button label */
             div.stRadio p {
-                font-size: 0.7em; /* Even smaller font for options to prevent wrapping */
+                font-size: 0.75em; /* Smaller font for options to fit better */
                 line-height: 1.1; 
                 white-space: normal !important; /* Allow wrapping within a tiny column */
                 word-break: break-word; /* Allow long words to break */
@@ -365,7 +366,7 @@ def personality_and_ai_survey_page():
             
             # Create columns for the header row: one for the question, then one for each Likert option
             # Adjust column width ratios to give more space proportionally to text column
-            header_cols = st.columns([2.5] + [1] * len(likert_options)) # Adjust this ratio based on visual check
+            header_cols = st.columns([2.5] + [1] * len(likert_options)) 
             
             with header_cols[0]:
                 st.write("") # Empty cell for alignment with question column
@@ -374,12 +375,16 @@ def personality_and_ai_survey_page():
                     st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
             st.divider()
 
+            # Initialize session state for this section's responses if not present
+            if f"section_responses_{section_idx}" not in st.session_state:
+                st.session_state[f"section_responses_{section_idx}"] = {q: None for q in questions}
+
             for stmt_idx, stmt in enumerate(questions):
                 # We need to maintain the selected state for each statement across reruns
-                # Store the selected option for this statement in session state
                 current_selection_key = f"selected_option_sec{section_idx}_stmt{stmt_idx}"
+                # Ensure each statement has an entry in session state for its selection
                 if current_selection_key not in st.session_state:
-                    st.session_state[current_selection_key] = None # No selection initially
+                    st.session_state[current_selection_key] = None
 
                 # Create columns for each statement row: one for the question, then one for EACH individual radio option
                 row_cols = st.columns([2.5] + [1] * len(likert_options)) # Match header column ratios
@@ -387,48 +392,42 @@ def personality_and_ai_survey_page():
                 with row_cols[0]:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
                 
+                # Get the currently selected value for this statement from session state
                 selected_value_for_this_row = st.session_state[current_selection_key]
                 
+                # Create individual radio buttons for each option in its own column
                 for i, option_text in enumerate(likert_options):
-                    with row_cols[i + 1]:
-                        # Create a single radio button for each option.
-                        # Its value will be the option_text if it's currently selected, None otherwise.
-                        # On click, it updates the session_state for this row.
+                    with row_cols[i + 1]: # +1 because first column is for the question text
+                        # Each st.radio represents a single option. Its key makes it unique.
+                        # The 'value' determines if it's selected.
+                        # The on_change callback will update the session_state for this row.
                         
-                        # Use a unique key for each radio button instance
                         unique_radio_key = f"radio_sec{section_idx}_stmt{stmt_idx}_opt{i}"
                         
-                        # This callback function will run when a radio button is clicked
-                        def update_selection(statement_key, chosen_option):
-                            st.session_state[statement_key] = chosen_option
+                        # Use a callback to update the selected option for this specific statement
+                        # Only ONE option for this statement can be selected.
+                        def on_radio_change(stmt_key, selected_option_value):
+                            st.session_state[stmt_key] = selected_option_value
                         
-                        # Display the radio button. It is "checked" if its value matches the stored selection.
-                        # Streamlit's st.radio, when given a single option, and index=0 (default)
-                        # effectively acts as a toggle button if its value is managed externally.
-                        
-                        # If the stored value for this row matches this option_text, set it as selected (index=0)
-                        # Otherwise, set it as unselected (index=None for newer Streamlit, or other workaround for older)
-                        is_selected = (selected_value_for_this_row == option_text)
-                        
+                        # If the currently stored selection for this row matches this option_text, it should appear selected
+                        # Otherwise, it should appear unselected (value=None means no selection for this individual radio)
                         st.radio(
-                            label=option_text, # Label is the text for this specific option
-                            options=[option_text], # Only this option is available for this radio button
-                            index=0 if is_selected else None, # Set as selected if it matches current_selection_key
-                            key=unique_radio_key,
-                            on_change=update_selection, # Callback to update session state
-                            args=(current_selection_key, option_text), # Args passed to callback
-                            label_visibility="visible", # Make label visible for styling
-                            horizontal=False # Display options vertically if needed, but in its own column
+                            label=option_text, # This is the label displayed for the option
+                            options=[option_text], # This individual radio button ONLY offers itself as an option
+                            index=0 if selected_value_for_this_row == option_text else None, # Set as selected if it matches the stored value
+                            key=unique_radio_key, # Unique key for this specific radio button instance
+                            on_change=on_radio_change,
+                            args=(current_selection_key, option_text),
+                            label_visibility="visible", # We need label visible for styling
+                            horizontal=False # Display radio circle and label vertically within its small column
                         )
-                        # We don't want horizontal=True here for the individual radio, it's just one option.
-                        # The horizontal alignment is managed by st.columns.
-                        
+                
                 # After iterating through all options for this statement,
                 # check if a choice was made for validation
                 if st.session_state[current_selection_key] is None:
                     all_questions_answered = False
                 
-                # Store the final response for this statement
+                # Store the final response for this statement (which is already in session_state)
                 responses[stmt] = st.session_state[current_selection_key]
 
             st.markdown("---")
@@ -567,7 +566,7 @@ def feedback_page():
 
             /* Adjust the size and wrapping of the text within the radio button label */
             div.stRadio p {
-                font-size: 0.75em; /* Even smaller font for options to prevent wrapping */
+                font-size: 0.75em; /* Smaller font for options to fit better */
                 line-height: 1.1; 
                 white-space: normal !important; /* Allow wrapping within a tiny column */
                 word-break: break-word; /* Allow long words to break */
@@ -638,10 +637,14 @@ def feedback_page():
                     st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
             st.divider()
 
+            # Initialize session state for this section's responses if not present
+            if f"feedback_section_responses_{section_idx}" not in st.session_state:
+                st.session_state[f"feedback_section_responses_{section_idx}"] = {q: None for q in questions}
+
             for stmt_idx, stmt in enumerate(questions):
                 current_selection_key = f"feedback_selected_option_sec{section_idx}_stmt{stmt_idx}"
                 if current_selection_key not in st.session_state:
-                    st.session_state[current_selection_key] = None # No selection initially
+                    st.session_state[current_selection_key] = None
 
                 # Create columns for each statement row
                 row_cols = st.columns([2.5] + [1] * len(likert_options))
@@ -655,17 +658,15 @@ def feedback_page():
                     with row_cols[i + 1]:
                         unique_radio_key = f"feedback_radio_sec{section_idx}_stmt{stmt_idx}_opt{i}"
                         
-                        def update_selection_feedback(statement_key, chosen_option):
-                            st.session_state[statement_key] = chosen_option
+                        def on_radio_change_feedback(stmt_key, chosen_option):
+                            st.session_state[stmt_key] = chosen_option
 
-                        is_selected = (selected_value_for_this_row == option_text)
-                        
                         st.radio(
                             label=option_text,
                             options=[option_text],
-                            index=0 if is_selected else None,
+                            index=0 if selected_value_for_this_row == option_text else None,
                             key=unique_radio_key,
-                            on_change=update_selection_feedback,
+                            on_change=on_radio_change_feedback,
                             args=(current_selection_key, option_text),
                             label_visibility="visible",
                             horizontal=False
