@@ -278,14 +278,8 @@ def personality_and_ai_survey_page():
                 margin: 0px; /* Remove margin */
             }
             /* Ensure the text label for each individual radio button does not wrap */
-            div.stRadio div[data-testid="stFlex"],
-            div.stRadio div[data-testid="stHorizontalRadio"] > label {
-                flex-wrap: nowrap !important; /* IMPORTANT: Prevent wrapping */
-                justify-content: center; /* Center the radio option within its column */
-            }
-            /* Adjust the size of the text within the radio button label (e.g., "Strongly Disagree") */
             div.stRadio p {
-                font-size: 0.8em; /* Further slightly smaller font for options to fit better */
+                font-size: 0.75em; /* Further slightly smaller font for options to fit better */
                 line-height: 1.0; /* Adjust line height if necessary */
                 white-space: nowrap !important; /* Ensure the option text itself doesn't wrap */
             }
@@ -296,20 +290,28 @@ def personality_and_ai_survey_page():
                 font-weight: bold; 
                 padding: 0px; /* Remove padding to control spacing via columns */
                 margin: 0px; /* Remove margin */
-                font-size: 0.85em; /* Slightly smaller font for headers */
+                font-size: 0.8em; /* Slightly smaller font for headers */
                 white-space: nowrap !important; /* Prevent header text wrapping */
+                overflow: hidden; /* Hide overflow if text is still too long */
+                text-overflow: ellipsis; /* Add ellipsis if text is cut */
             }
             .matrix-row-question {
                 display: flex;
                 align-items: center; /* Vertically center question text */
-                min-height: 55px; /* Ensure enough height for question row to prevent overlap */
-                padding-right: 10px; /* Add some padding to the right of the question */
+                min-height: 60px; /* Ensure enough height for question row to prevent overlap */
+                padding-right: 5px; /* Add some padding to the right of the question */
             }
             /* Reduce space between radio options in the horizontal group */
             div[data-testid="stHorizontalRadio"] {
                 gap: 0px !important; /* Adjust this value if you need more/less spacing between radio options */
                 justify-content: space-between; /* Distribute options across the available space */
             }
+
+            /* Ensure the stRadio container takes up all available column width */
+            .stForm .stRadio {
+                width: 100%;
+            }
+
         </style>
     """, unsafe_allow_html=True)
 
@@ -373,12 +375,13 @@ def personality_and_ai_survey_page():
 
             for stmt_idx, stmt in enumerate(questions):
                 # Create columns for each statement row: one for the question, then one for the radio group
-                row_cols = st.columns([3, sum([0.7] * len(likert_options))]) # Combine radio option widths into one column
+                # This ensures the question text and the radio buttons align with the headers
+                question_col, options_col = st.columns([3, sum([0.7] * len(likert_options))])
                 
-                with row_cols[0]:
+                with question_col:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
                 
-                with row_cols[1]: # This column will contain the single st.radio widget for the row
+                with options_col: # This column will contain the single st.radio widget for the row
                     selected_value = st.radio(
                         label=stmt, 
                         options=likert_options, 
@@ -518,14 +521,8 @@ def feedback_page():
                 margin: 0px; /* Remove margin */
             }
             /* Ensure the text label for each individual radio button does not wrap */
-            div.stRadio div[data-testid="stFlex"],
-            div.stRadio div[data-testid="stHorizontalRadio"] > label {
-                flex-wrap: nowrap !important; /* IMPORTANT: Prevent wrapping */
-                justify-content: center; /* Center the radio option within its column */
-            }
-            /* Adjust the size of the text within the radio button label (e.g., "Strongly Disagree") */
             div.stRadio p {
-                font-size: 0.8em; /* Further slightly smaller font for options to fit better */
+                font-size: 0.75em; /* Further slightly smaller font for options to fit better */
                 line-height: 1.0; /* Adjust line height if necessary */
                 white-space: nowrap !important; /* Ensure the option text itself doesn't wrap */
             }
@@ -538,17 +535,23 @@ def feedback_page():
                 margin: 0px; /* Remove margin */
                 font-size: 0.85em; /* Slightly smaller font for headers */
                 white-space: nowrap !important; /* Prevent header text wrapping */
+                overflow: hidden; /* Hide overflow if text is still too long */
+                text-overflow: ellipsis; /* Add ellipsis if text is cut */
             }
             .matrix-row-question {
                 display: flex;
                 align-items: center; /* Vertically center question text */
-                min-height: 55px; /* Ensure enough height for question row to prevent overlap */
-                padding-right: 10px; /* Add some padding to the right of the question */
+                min-height: 60px; /* Ensure enough height for question row to prevent overlap */
+                padding-right: 5px; /* Add some padding to the right of the question */
             }
             /* Reduce space between radio options in the horizontal group */
             div[data-testid="stHorizontalRadio"] {
                 gap: 0px !important; /* Adjust this value if you need more/less spacing between radio options */
                 justify-content: space-between; /* Distribute options across the available space */
+            }
+            /* Ensure the stRadio container takes up all available column width */
+            .stForm .stRadio {
+                width: 100%;
             }
         </style>
     """, unsafe_allow_html=True)
