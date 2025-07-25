@@ -267,7 +267,8 @@ def personality_and_ai_survey_page():
     # Custom CSS for matrix alignment and radio button appearance
     st.markdown("""
         <style>
-            /* HIDE THE LABEL TEXT FOR INDIVIDUAL RADIO OPTIONS */
+            /* Adjust the size and wrapping of the text within the radio button label */
+            /* We want the internal <p> tags to be hidden completely */
             div.stRadio p {
                 display: none !important; 
             }
@@ -853,4 +854,4 @@ def admin_view():
 # Main execution
 # ------------------------
 if __name__ == "__main__":
-    main()
+    main()s
