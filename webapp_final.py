@@ -143,13 +143,12 @@ def welcome_page():
     login_type = st.radio("Login as:", ["Participant", "Admin"], horizontal=True, key="login_type_radio")
 
     if login_type == "Participant":
-        # Using a form for input and button for better control over submission
         with st.form("prolific_id_form"):
             new_id = st.text_input("Enter your Prolific ID:", key="prolific_id_input_form")
             submitted = st.form_submit_button("Start Survey")
             if submitted:
                 if consent_agreed:
-                    if new_id and new_id.strip() != "": # Ensure ID is not empty or just spaces
+                    if new_id and new_id.strip() != "":
                         st.session_state.prolific_id = new_id.strip()
                         st.session_state.page = 1
                         st.rerun()
@@ -176,55 +175,40 @@ def survey_page():
     with st.form("pre_chat_survey_form"):
         responses = {}
         
-        # Demographics
-        responses['age'] = st.number_input("How old are you?", min_value=1, max_value=120, step=1, key="age_input", value=None, placeholder="Enter age") # Set value=None for validation
+        responses['age'] = st.number_input("How old are you?", min_value=1, max_value=120, step=1, key="age_input", value=None, placeholder="Enter age")
         
-        # Gender with a "Please select" default for validation
         gender_options = ["- Please select -", "Male", "Female", "Non-binary / third gender", "Prefer not to say"]
         selected_gender = st.radio("Which gender do you identify with?", gender_options, index=0, key="gender_radio")
-        if selected_gender == gender_options[0]:
-            responses['gender'] = None # Mark for validation
-        else:
-            responses['gender'] = selected_gender
+        responses['gender'] = None if selected_gender == gender_options[0] else selected_gender
 
-        # Education with a "Please select" default for validation
         education_options = ["- Please select -", "Highschool", "Bachelor's Degree", "Master's degree", "Doctorate", "Other"]
         selected_education = st.radio("What is the highest level of education that you have completed?", education_options, index=0, key="education_radio")
         if selected_education == education_options[0]:
-            responses['education'] = None # Mark for validation
+            responses['education'] = None
         else:
             responses['education'] = selected_education
             if responses['education'] == "Other":
                 responses['education_other'] = st.text_input("Please specify your education level:", key="education_other_input")
             else:
-                responses['education_other'] = "" # Clear if not "Other"
+                responses['education_other'] = ""
         
-        responses['religion'] = st.text_input("Which religion do you align with, if any? (Optional)", key="religion_input") # Made optional
+        responses['religion'] = st.text_input("Which religion do you align with, if any? (Optional)", key="religion_input")
 
-        # AI Familiarity with a "Please select" default for validation
         ai_familiarity_options = ["- Please select -", "Not familiar", "Somewhat familiar", "Very familiar"]
         selected_ai_familiarity = st.radio("How familiar are you with AI tools like ChatGPT?", ai_familiarity_options, index=0, key="ai_familiarity_radio")
-        if selected_ai_familiarity == ai_familiarity_options[0]:
-            responses['experience_with_ai'] = None # Mark for validation
-        else:
-            responses['experience_with_ai'] = selected_ai_familiarity
+        responses['experience_with_ai'] = None if selected_ai_familiarity == ai_familiarity_options[0] else selected_ai_familiarity
 
-        # Creative Writing Frequency with a "Please select" default for validation
         creative_writing_options = ["- Please select -", "Never", "Sometimes", "Often"]
         selected_creative_writing = st.radio("How often do you engage in creative writing (e.g., stories, blogs)?", creative_writing_options, index=0, key="creative_writing_radio")
-        if selected_creative_writing == creative_writing_options[0]:
-            responses['creative_writing_frequency'] = None # Mark for validation
-        else:
-            responses['creative_writing_frequency'] = selected_creative_writing
+        responses['creative_writing_frequency'] = None if selected_creative_writing == creative_writing_options[0] else selected_creative_writing
         
         st.markdown("---")
         st.subheader("Block 2: Current Emotional State (SAM)")
 
         st.markdown("""
         We'd like to know how you're feeling right now. Please use the Self-Assessment Manikin (SAM) graphic below to rate your current emotional state.
-        
-        * The top row shows **Valence** – how pleasant or unpleasant you feel. (Left = Unpleasant, Right = Pleasant)
-        * The bottom row shows **Arousal** – how calm or excited you feel. (Left = Calm, Right = Excited)
+        * **Valence** (top row): How pleasant or unpleasant you feel.
+        * **Arousal** (bottom row): How calm or excited you feel.
         """)
         
         if os.path.exists("images/SAM Model.jpeg"):
@@ -237,18 +221,17 @@ def survey_page():
         
         submitted = st.form_submit_button("Next")
         if submitted:
-            # Validation logic
-            if responses['age'] is None or responses['age'] <= 0:
+            if responses.get('age') is None or responses.get('age', 0) <= 0:
                 st.error("Please enter your age.")
-            elif responses['gender'] is None:
+            elif responses.get('gender') is None:
                 st.error("Please select your gender.")
-            elif responses['education'] is None:
+            elif responses.get('education') is None:
                 st.error("Please select your highest level of education.")
-            elif responses['experience_with_ai'] is None:
+            elif responses.get('experience_with_ai') is None:
                 st.error("Please indicate your familiarity with AI tools.")
-            elif responses['creative_writing_frequency'] is None:
+            elif responses.get('creative_writing_frequency') is None:
                 st.error("Please indicate how often you engage in creative writing.")
-            elif responses['education'] == "Other" and not responses['education_other'].strip():
+            elif responses.get('education') == "Other" and not responses.get('education_other', '').strip():
                 st.error("Please specify your education level.")
             else:
                 st.session_state.survey_responses = responses
@@ -261,52 +244,14 @@ def survey_page():
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
-    # Custom CSS for matrix alignment and radio button appearance
     st.markdown("""
         <style>
-            /* HIDE THE LABEL TEXT FOR INDIVIDUAL RADIO OPTIONS */
-            div.stRadio p {
-                display: none !important;
-            }
-
-            /* THIS IS THE KEY PART FOR ALIGNMENT */
-            /* Target the container for a horizontal radio group */
-            div[data-testid="stHorizontalRadio"] {
-                display: flex;
-                justify-content: space-around; /* Distribute buttons evenly */
-                align-items: center;
-                width: 100%; /* Ensure it takes the full width of its column */
-            }
-
-            /* Target the label that WRAPS each radio button */
-            div[data-testid="stHorizontalRadio"] > label {
-                display: flex;
-                justify-content: center; /* Center the circle within the label's space */
-                align-items: center;
-                margin: 0 !important;
-                flex-grow: 1; /* Allow each option to take up equal space */
-            }
-
-            /* Style the header text */
-            .matrix-header-text {
-                text-align: center;
-                font-weight: bold;
-                font-size: 0.8em;
-                white-space: normal !important;
-            }
-
-            /* Style the question text on the left */
-            .matrix-row-question {
-                display: flex;
-                align-items: center;
-                min-height: 60px; /* Give rows consistent height */
-                padding-right: 5px;
-            }
-
-            /* Reduce the gap between the columns in the matrix */
-            .stColumns > div[data-testid="stVerticalBlock"] {
-                gap: 0.2rem;
-            }
+            div.stRadio p { display: none !important; }
+            div[data-testid="stHorizontalRadio"] { display: flex; justify-content: space-around; align-items: center; width: 100%; }
+            div[data-testid="stHorizontalRadio"] > label { display: flex; justify-content: center; align-items: center; margin: 0 !important; flex-grow: 1; }
+            .matrix-header-text { text-align: center; font-weight: bold; font-size: 0.8em; white-space: normal !important; }
+            .matrix-row-question { display: flex; align-items: center; min-height: 60px; padding-right: 5px; }
+            .stColumns > div[data-testid="stVerticalBlock"] { gap: 0.2rem; }
         </style>
     """, unsafe_allow_html=True)
 
@@ -344,31 +289,25 @@ def personality_and_ai_survey_page():
 
         for section_idx, (section, questions) in enumerate(matrix_questions.items()):
             st.subheader(section)
-
-            # Define column ratios
             col_ratios = [2.5] + [1] * len(likert_options)
             
-            # --- HEADER ROW ---
             header_cols = st.columns(col_ratios)
             with header_cols[0]:
-                st.write("") # Empty cell for alignment
+                st.write("")
             for i, option in enumerate(likert_options):
                 with header_cols[i + 1]:
                     st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
             st.divider()
 
-            # --- QUESTION ROWS ---
             for stmt_idx, stmt in enumerate(questions):
-                # Use one column for the question and another that spans the options for the radio group
-                q_col, r_col = st.columns(col_ratios)
+                q_col, r_col = st.columns([2.5, sum([1] * len(likert_options))])
 
                 with q_col:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
-
                 with r_col:
                     radio_key = f"personality_sec{section_idx}_stmt{stmt_idx}"
                     selected_value = st.radio(
-                        label=stmt, # Hidden label
+                        label=stmt,
                         options=likert_options,
                         index=None,
                         key=radio_key,
@@ -391,7 +330,6 @@ def personality_and_ai_survey_page():
                 st.session_state.page = 3
                 st.rerun()
 
-
 # ------------------------
 # Page 3: Instructions
 # ------------------------
@@ -403,9 +341,7 @@ def page2():
         - **Your Task:** Brainstorm ideas back and forth with an AI assistant for a limited number of turns.
         - **Goal:** After the brainstorming session concludes, you will be asked to write a short summary of your discussion.
         """)
-    # Using the next_button helper
     next_button(current_page=3, next_page=4, label="Start Brainstorming", key="start_brainstorming_btn")
-
 
 # ------------------------
 # Page 4: Chat Interface 
@@ -413,20 +349,16 @@ def page2():
 def page3():
     st.title("Brainstorm with Your Teammate")
 
-    # This system prompt contains the rules you provided.
     system_prompt = """You are brainstorming with the user like a creative teammate. Respond with vivid ideas, challenges, and twists. Never just ask questions—build on what the user says. You will have exactly 10 user turns. After the user's 10th message, do not wait for further input. Instead, say something like: 'That's a great idea: Looks like we’ve explored a lot of wild ideas together! I’ll go ahead and wrap this up with a summary story. Please press the next button to move on to the summary page' Then write a fun, creative summary that blends your ideas and the user’s ideas into a cohesive short story. At the end of the story, remind the user to click 'Next' to proceed to the summary page."""
 
-    # Initialize chat history and turn counter
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = [{"role": "system", "content": system_prompt}]
         st.session_state.user_turns = 0
 
-    # Display chat messages
     for msg in st.session_state.chat_history:
         if msg["role"] != "system":
             st.chat_message(msg["role"]).write(msg["content"])
 
-    # Turn counting and input disabling logic
     if 'user_turns' not in st.session_state:
         st.session_state.user_turns = 0
     
@@ -435,55 +367,43 @@ def page3():
     if chat_limit_reached:
        st.info("Brainstorming session complete! Please review the final story and click 'Next' to continue.")
 
-    # Get user input, disable if limit is reached
     user_input = st.chat_input("Your message...", disabled=chat_limit_reached, key="chat_input_text")
 
     if user_input:
-        # Increment turn counter and add user message to history
         st.session_state.user_turns += 1
         st.session_state.chat_history.append({"role": "user", "content": user_input})
         
-        # Call the API for a response
-        if client: # Only try to call API if client is initialized
+        if client:
             with st.spinner("Your teammate is thinking..."):
                 try:
                     response = client.chat.completions.create(
                         model="gpt-4", 
                         messages=st.session_state.chat_history,
-                        max_tokens=100 # Limit AI response length to be more concise
+                        max_tokens=150
                     )
                     reply = response.choices[0].message.content
                     st.session_state.chat_history.append({"role": "assistant", "content": reply})
                 except Exception as e:
                     st.error(f"An error occurred with the API call: {e}")
         else:
-            st.error("API client not initialized. Cannot generate AI response. Please ensure OPENAI_API_KEY is set in Streamlit secrets.")
-
+            st.error("API client not initialized. Cannot generate AI response.")
         st.rerun()
 
-    # Navigation to the next page
-    if st.session_state.user_turns >= 10: # Only show "Next" button after 10 turns
-        # Using the next_button helper
+    if st.session_state.user_turns >= 10:
         next_button(current_page=4, next_page=5, label="Next: Write Summary", key="go_to_summary_btn")
-
 
 # ------------------------
 # Page 5: Summary
 # ------------------------
 def page4():
     st.title("Summary")
-    
-    # The text area itself updates st.session_state.summary_text because of the key
     st.text_area("Please summarize your discussion:", key="summary_text", height=300)
-    
-    # Get current value from session_state for validation
     current_summary_text = st.session_state.get("summary_text", "") 
 
     if st.button("Submit Summary", key="submit_summary_btn"):
-        if current_summary_text.strip() == "": # Check the value from session_state
+        if current_summary_text.strip() == "":
             st.error("Please provide a summary before proceeding.")
         else:
-            # The value is already in st.session_state.summary_text
             st.session_state.page = 6
             st.rerun()
 
@@ -493,68 +413,27 @@ def page4():
 def feedback_page():
     st.title("Post-Task Feedback")
 
-    # Custom CSS for matrix alignment and radio button appearance
     st.markdown("""
         <style>
-            /* HIDE THE LABEL TEXT FOR INDIVIDUAL RADIO OPTIONS */
-            div.stRadio p {
-                display: none !important;
-            }
-
-            /* THIS IS THE KEY PART FOR ALIGNMENT */
-            /* Target the container for a horizontal radio group */
-            div[data-testid="stHorizontalRadio"] {
-                display: flex;
-                justify-content: space-around; /* Distribute buttons evenly */
-                align-items: center;
-                width: 100%; /* Ensure it takes the full width of its column */
-            }
-
-            /* Target the label that WRAPS each radio button */
-            div[data-testid="stHorizontalRadio"] > label {
-                display: flex;
-                justify-content: center; /* Center the circle within the label's space */
-                align-items: center;
-                margin: 0 !important;
-                flex-grow: 1; /* Allow each option to take up equal space */
-            }
-
-            /* Style the header text */
-            .matrix-header-text {
-                text-align: center;
-                font-weight: bold;
-                font-size: 0.8em;
-                white-space: normal !important;
-            }
-
-            /* Style the question text on the left */
-            .matrix-row-question {
-                display: flex;
-                align-items: center;
-                min-height: 60px; /* Give rows consistent height */
-                padding-right: 5px;
-            }
-
-            /* Reduce the gap between the columns in the matrix */
-            .stColumns > div[data-testid="stVerticalBlock"] {
-                gap: 0.2rem;
-            }
+            div.stRadio p { display: none !important; }
+            div[data-testid="stHorizontalRadio"] { display: flex; justify-content: space-around; align-items: center; width: 100%; }
+            div[data-testid="stHorizontalRadio"] > label { display: flex; justify-content: center; align-items: center; margin: 0 !important; flex-grow: 1; }
+            .matrix-header-text { text-align: center; font-weight: bold; font-size: 0.8em; white-space: normal !important; }
+            .matrix-row-question { display: flex; align-items: center; min-height: 60px; padding-right: 5px; }
+            .stColumns > div[data-testid="stVerticalBlock"] { gap: 0.2rem; }
         </style>
     """, unsafe_allow_html=True)
 
-
     matrix_questions = {
         "Feedback on the Writing Process": [
-            "I was satisfied with the writing process",
-            "I enjoyed the writing process",
+            "I was satisfied with the writing process", "I enjoyed the writing process",
             "I found it easy to complete the writing process",
             "I was able to express my creative goals during the writing process",
         ],
         "Feedback on the Final Outcome": [
             "I am satisfied with the quality of the final outcome",
             "I feel a sense of ownership of the final outcome",
-            "I am proud of the final outcome",
-            "I found the final outcome to be unique",
+            "I am proud of the final outcome", "I found the final outcome to be unique",
         ],
         "Accountability of Final Outcome": [
             "I'm willing to take the responsibility if my product is criticized for containing deceptive content.",
@@ -572,49 +451,39 @@ def feedback_page():
         
         for section_idx, (section, questions) in enumerate(matrix_questions.items()):
             st.subheader(section)
-            
-            # Define column ratios
             col_ratios = [2.5] + [1] * len(likert_options)
             
-            # --- HEADER ROW ---
             header_cols = st.columns(col_ratios)
             with header_cols[0]:
-                st.write("") # Empty cell
+                st.write("")
             for i, option in enumerate(likert_options):
                 with header_cols[i + 1]:
                     st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
             st.divider()
 
-            # --- QUESTION ROWS ---
             for stmt_idx, stmt in enumerate(questions):
-                q_col, r_col = st.columns(col_ratios)
+                q_col, r_col = st.columns([2.5, sum([1] * len(likert_options))])
                 
                 with q_col:
                     st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
-                
                 with r_col:
                     radio_key = f"feedback_sec{section_idx}_stmt{stmt_idx}"
                     selected_value = st.radio(
-                        label=stmt, # Hidden label
+                        label=stmt,
                         options=likert_options, 
                         index=None,
                         key=radio_key,
                         horizontal=True,
                         label_visibility="collapsed"
                     )
-                
-                responses[stmt] = selected_value
-                if selected_value is None:
-                    all_feedback_answered = False
+                    responses[stmt] = selected_value
+                    if selected_value is None:
+                        all_feedback_answered = False
             st.markdown("---")
 
         st.subheader("Post-Task Emotional State (SAM)")
-
         st.markdown("""
-        We'd like to know how you're feeling right now. Please use the Self-Assessment Manikin (SAM) graphic below to rate your current emotional state.
-        
-        * The top row shows **Valence** – how pleasant or unpleasant you feel. (Left = Unpleasant, Right = Pleasant)
-        * The bottom row shows **Arousal** – how calm or excited you feel. (Left = Calm, Right = Excited)
+        We'd like to know how you're feeling right now.
         """)
         
         if os.path.exists("images/SAM Model.jpeg"):
@@ -647,10 +516,6 @@ def page5():
 # Helper for Admin Page: Convert data to CSV
 # ------------------------
 def convert_data_to_csv(data_list):
-    """
-    Converts a list of submission dictionaries into a single CSV string.
-    Flattens nested survey and feedback responses.
-    """
     if not data_list:
         return ""
         
@@ -658,22 +523,18 @@ def convert_data_to_csv(data_list):
     for entry in data_list:
         flat_entry = {}
         
-        # Add top-level fields
         flat_entry['prolific_id'] = entry.get('prolific_id', 'N/A')
         flat_entry['timestamp'] = entry.get('timestamp', 'N/A')
         flat_entry['summary'] = entry.get('summary', '')
 
-        # Flatten survey responses
         survey_responses = entry.get('survey_responses', {})
         for key, value in survey_responses.items():
             flat_entry[f"survey_{key}"] = value
 
-        # Flatten feedback responses
         feedback_responses = entry.get('feedback', {})
         for key, value in feedback_responses.items():
             flat_entry[f"feedback_{key}"] = value
 
-        # Concatenate chat history into a single string
         chat_history = entry.get('chat_history', [])
         chat_str = ""
         for msg in chat_history:
@@ -685,18 +546,15 @@ def convert_data_to_csv(data_list):
         
     df = pd.DataFrame(processed_data)
     
-    # Reorder columns for better readability
     id_cols = ['prolific_id', 'timestamp']
     survey_cols = sorted([col for col in df.columns if col.startswith('survey_')])
     feedback_cols = sorted([col for col in df.columns if col.startswith('feedback_')])
     other_cols = ['summary', 'chat_history']
     
-    # Filter out columns that might not exist in all records
     final_cols = id_cols + survey_cols + feedback_cols + other_cols
     existing_cols = [col for col in final_cols if col in df.columns]
     
     df = df[existing_cols]
-
     return df.to_csv(index=False).encode('utf-8')
 
 # ------------------------
@@ -712,28 +570,24 @@ def admin_view():
         st.warning("No submission files found.")
         return
 
-    # Load all data from JSON files
     all_data = []
     for fname in all_files:
         try:
             with open(os.path.join(CHAT_LOGS_FOLDER, fname)) as f:
                 entry = json.load(f)
-                entry['filename'] = fname # Add filename for reference
+                entry['filename'] = fname
                 all_data.append(entry)
         except Exception as e:
             st.error(f"Could not read or parse file {fname}: {e}")
 
-    # --- Interactive Search and Download ---
     st.header("Search and Export")
     search_query = st.text_input("Search by Prolific ID (leave empty for all):", key="admin_search_input")
 
-    # Filter data based on search query
     if search_query:
         filtered_data = [d for d in all_data if search_query.lower() in d.get('prolific_id', '').lower()]
     else:
         filtered_data = all_data
 
-    # Convert filtered data to CSV
     csv_data = convert_data_to_csv(filtered_data)
 
     st.download_button(
@@ -747,7 +601,6 @@ def admin_view():
     
     st.markdown("---")
 
-    # --- Display Filtered Submissions ---
     st.header(f"Displaying {len(filtered_data)} of {len(all_data)} Submissions")
 
     if not filtered_data:
@@ -760,12 +613,10 @@ def admin_view():
             with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
                 st.markdown(f"**Filename:** `{entry.get('filename')}`")
                 
-                # Display Survey Responses
                 if 'survey_responses' in entry and entry['survey_responses']:
                     st.subheader("Survey Responses")
                     st.json(entry['survey_responses'], expanded=False)
 
-                # Display Chat History
                 if 'chat_history' in entry and entry['chat_history']:
                     st.subheader("Chat History")
                     for msg in entry['chat_history']:
@@ -773,12 +624,10 @@ def admin_view():
                             with st.chat_message(name=msg.get('role', 'none')):
                                 st.write(msg.get('content', ''))
 
-                # Display Summary
                 if 'summary' in entry and entry['summary']:
                     st.subheader("User Summary")
                     st.text_area("Summary", value=entry['summary'], height=150, disabled=True, key=f"summary_display_{prolific_id}_{timestamp}")
 
-                # Display Feedback
                 if 'feedback' in entry and entry['feedback']:
                     st.subheader("Feedback Responses")
                     st.json(entry['feedback'], expanded=False)
