@@ -336,10 +336,8 @@ def personality_and_ai_survey_page():
             div[data-testid="stHorizontalRadio"] {
                 display: flex; /* Use flexbox */
                 flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                justify-content: space-between; /* Distribute items evenly, pushing first/last to edges */
-                align-items: center; /* Align items vertically (circles) */
+                /* Removed justify-content and align-items here, as labels will handle their own centering */
                 width: 100%; /* Take full width of its parent column */
-                /* padding: 0 5px; Removed this as flex-grow and justify-content on label handles spacing */
             }
             /* Ensure individual radio options don't have extra margins */
             div[data-testid="stHorizontalRadio"] > label {
@@ -441,8 +439,9 @@ def personality_and_ai_survey_page():
         if submitted:
             if not all_questions_answered:
                 st.error("Please answer all questions before proceeding.")
-            elif responses.get("If you're reading this carefully, select 'Somewhat Agree'.") != "Somewhat Agree":
-                st.error("Attention check failed. Please review your answers carefully and select 'Somewhat Agree' for the attention check question.")
+            # Removed the attention check validation
+            # elif responses.get("If you're reading this carefully, select 'Somewhat Agree'.") != "Somewhat Agree":
+            #     st.error("Attention check failed. Please review your answers carefully and select 'Somewhat Agree' for the attention check question.")
             else:
                 st.session_state.survey_responses.update(responses)
                 st.session_state.page = 3
@@ -597,9 +596,9 @@ def feedback_page():
                 display: flex; /* Use flexbox to center the circle */
                 align-items: center; /* Center horizontally */
                 justify-content: center; /* Center vertically */
-                /* NEW: More precise positioning using transform */
-                position: relative; 
-                transform: translateX(0px); /* Adjust this value (e.g., -2px, 5px) to shift the circle horizontally */
+                /* CRITICAL: Adjust this transform value to nudge the circles */
+                /* Experiment with small positive or negative pixel values (e.g., -2px, 2px, 0px) */
+                transform: translateX(0px); /* Start at 0, adjust as needed */
             }
 
             /* Adjust the label container for each radio option - only the circle is seen */
@@ -642,10 +641,8 @@ def feedback_page():
             div[data-testid="stHorizontalRadio"] {
                 display: flex; /* Use flexbox */
                 flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                justify-content: space-between; /* Distribute items evenly, pushing first/last to edges */
-                align-items: center; /* Align items vertically (circles) */
+                /* Removed justify-content and align-items here, as labels will handle their own centering */
                 width: 100%; /* Take full width of its parent column */
-                /* padding: 0 5px; Removed this as flex-grow and justify-content on label handles spacing */
             }
             /* Ensure individual radio options don't have extra margins */
             div[data-testid="stHorizontalRadio"] > label {
