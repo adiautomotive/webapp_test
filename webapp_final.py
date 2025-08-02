@@ -336,7 +336,8 @@ def personality_and_ai_survey_page():
             div[data-testid="stHorizontalRadio"] {
                 display: flex; /* Use flexbox */
                 flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                /* Removed justify-content and align-items here, as labels will handle their own centering */
+                justify-content: space-around; /* Distribute items evenly with space around them */
+                align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
             }
             /* Ensure individual radio options don't have extra margins */
@@ -641,7 +642,8 @@ def feedback_page():
             div[data-testid="stHorizontalRadio"] {
                 display: flex; /* Use flexbox */
                 flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                /* Removed justify-content and align-items here, as labels will handle their own centering */
+                justify-content: space-around; /* Distribute items evenly with space around them */
+                align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
             }
             /* Ensure individual radio options don't have extra margins */
