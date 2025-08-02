@@ -335,12 +335,15 @@ def personality_and_ai_survey_page():
                 justify-content: space-between; /* Distribute items evenly, pushing first/last to edges */
                 align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
-                padding: 0 5px; /* Add small horizontal padding to keep circles off the edge */
+                /* padding: 0 5px; Removed this as flex-grow and justify-content on label handles spacing */
             }
             /* Ensure individual radio options don't have extra margins */
             div[data-testid="stHorizontalRadio"] > label {
                 margin: 0px !important; /* Remove all margins */
                 flex-grow: 1; /* Allow labels to grow and fill space */
+                display: flex; /* Make label a flex container */
+                justify-content: center; /* Center content (radio circle) horizontally */
+                align-items: center; /* Center content (radio circle) vertically */
             }
         </style>
     """, unsafe_allow_html=True)
@@ -638,12 +641,15 @@ def feedback_page():
                 justify-content: space-between; /* Distribute items evenly, pushing first/last to edges */
                 align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
-                padding: 0 5px; /* Add small horizontal padding to keep circles off the edge */
+                /* padding: 0 5px; Removed this as flex-grow and justify-content on label handles spacing */
             }
             /* Ensure individual radio options don't have extra margins */
             div[data-testid="stHorizontalRadio"] > label {
                 margin: 0px !important; /* Remove all margins */
                 flex-grow: 1; /* Allow labels to grow and fill space */
+                display: flex; /* Make label a flex container */
+                justify-content: center; /* Center content (radio circle) horizontally */
+                align-items: center; /* Center content (radio circle) vertically */
             }
         </style>
     """, unsafe_allow_html=True)
