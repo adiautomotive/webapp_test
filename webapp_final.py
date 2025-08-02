@@ -202,7 +202,8 @@ def survey_page():
             else:
                 responses['education_other'] = "" # Clear if not "Other"
         
-        responses['religion'] = st.text_input("Which religion do you align with, if any? (Optional)", key="religion_input") # Made optional
+        # Religion question - now compulsory with "None" option
+        responses['religion'] = st.text_input("Which religion do you align with, if any? (Write 'None' if you don't want to specify)", key="religion_input")
 
         # AI Familiarity with a "Please select" default for validation
         ai_familiarity_options = ["- Please select -", "Not familiar", "Somewhat familiar", "Very familiar"]
@@ -254,6 +255,9 @@ def survey_page():
                 st.error("Please indicate how often you engage in creative writing.")
             elif responses['education'] == "Other" and not responses['education_other'].strip():
                 st.error("Please specify your education level.")
+            # New validation for religion field
+            elif not responses['religion'].strip():
+                st.error("Please enter your religion or write 'None' if you don't want to specify.")
             # SAM scale validation
             elif responses['valence'] == 0:
                 st.error("Please select a value for Valence.")
@@ -734,8 +738,8 @@ def feedback_page():
             st.warning("SAM Model image not found.")
         
         # SAM sliders now start at 0
-        responses['arousal_post'] = st.slider("Arousal after task (Calm ← → Excited)", 1, 9, 0, key="arousal_post_slider")
-        responses['valence_post'] = st.slider("Valence after task (Unpleasant ← → Pleasant)", 1, 9, 0, key="valence_post_slider")
+        responses['arousal_post'] = st.slider("Arousal after task (Calm ← → Excited)", 0, 9, 0, key="arousal_post_slider")
+        responses['valence_post'] = st.slider("Valence after task (Unpleasant ← → Pleasant)", 0, 9, 0, key="valence_post_slider")
 
         submitted = st.form_submit_button("Finish")
         if submitted:
