@@ -287,24 +287,23 @@ def personality_and_ai_survey_page():
                 width: 18px; /* Make circle slightly larger for visibility */
                 height: 18px;
                 margin: 0px; /* Remove all margins */
-                display: flex; /* Use flexbox to center the circle */
-                align-items: center; /* Center horizontally */
-                justify-content: center; /* Center vertically */
-                
-                /* CRITICAL: Adjust this transform value to nudge the circles */
-                /* Experiment with small positive or negative pixel values (e.g., -2px, 2px, 0px) */
-                transform: translateX(0px); /* Start at 0, adjust as needed */
+                /* The centering for the circle itself is handled by its parent label's flex properties */
             }
 
-            /* Adjust the label container for each radio option - only the circle is seen */
+            /* Adjust the label container for each radio option */
             div.stRadio > label {
                 flex-direction: row; /* Keep circle and hidden label horizontal */
-                align-items: center; /* Vertically center the circle within its allocated space */
-                justify-content: center; /* Horizontally center the circle within its allocated space */
                 padding: 0px; /* No padding on the label itself */
-                margin: 0px; /* No margin on the label itself */
+                margin: 0px !important; /* Ensure no external margins */
                 height: 100%; /* Take full height of column for centering */
                 width: 100%; /* Take full width of column for centering */
+                
+                /* Make the label itself a flex container to center its child (the radio circle) */
+                display: flex; 
+                justify-content: center; /* Center horizontally */
+                align-items: center; /* Center vertically */
+                flex-grow: 1; /* Allow labels to grow and fill space */
+                flex-basis: 0; /* Important for equal distribution with flex-grow */
             }
             
             /* Specific alignment for matrix headers */
@@ -326,6 +325,7 @@ def personality_and_ai_survey_page():
             }
             /* Reduce gap between columns if necessary */
             .stColumns > div {
+                /* This targets the internal divs of st.columns */
                 gap: 0.1rem; /* Even smaller gap between columns for tighter matrix */
             }
             /* Ensure the stRadio container takes up all available column width */
@@ -339,14 +339,6 @@ def personality_and_ai_survey_page():
                 justify-content: space-around; /* Distribute items evenly with space around them */
                 align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
-            }
-            /* Ensure individual radio options don't have extra margins */
-            div[data-testid="stHorizontalRadio"] > label {
-                margin: 0px !important; /* Remove all margins */
-                flex-grow: 1; /* Allow labels to grow and fill space */
-                display: flex; /* Make label a flex container */
-                justify-content: center; /* Center content (radio circle) horizontally */
-                align-items: center; /* Center content (radio circle) vertically */
             }
         </style>
     """, unsafe_allow_html=True)
@@ -594,23 +586,23 @@ def feedback_page():
                 width: 18px; /* Make circle slightly larger for visibility */
                 height: 18px;
                 margin: 0px; /* Remove all margins */
-                display: flex; /* Use flexbox to center the circle */
-                align-items: center; /* Center horizontally */
-                justify-content: center; /* Center vertically */
-                /* CRITICAL: Adjust this transform value to nudge the circles */
-                /* Experiment with small positive or negative pixel values (e.g., -2px, 2px, 0px) */
-                transform: translateX(0px); /* Start at 0, adjust as needed */
+                /* The centering for the circle itself is handled by its parent label's flex properties */
             }
 
-            /* Adjust the label container for each radio option - only the circle is seen */
+            /* Adjust the label container for each radio option */
             div.stRadio > label {
                 flex-direction: row; /* Keep circle and hidden label horizontal */
-                align-items: center; /* Vertically center the circle within its allocated space */
-                justify-content: center; /* Horizontally center the circle within its allocated space */
                 padding: 0px; /* No padding on the label itself */
-                margin: 0px; /* No margin on the label itself */
+                margin: 0px !important; /* Ensure no external margins */
                 height: 100%; /* Take full height of column for centering */
                 width: 100%; /* Take full width of column for centering */
+                
+                /* Make the label itself a flex container to center its child (the radio circle) */
+                display: flex; 
+                justify-content: center; /* Center horizontally */
+                align-items: center; /* Center vertically */
+                flex-grow: 1; /* Allow labels to grow and fill space */
+                flex-basis: 0; /* Important for equal distribution with flex-grow */
             }
             
             /* Specific alignment for matrix headers */
@@ -632,6 +624,7 @@ def feedback_page():
             }
             /* Reduce gap between columns if necessary */
             .stColumns > div {
+                /* This targets the internal divs of st.columns */
                 gap: 0.1rem; /* Even smaller gap between columns for tighter matrix */
             }
             /* Ensure the stRadio container takes up all available column width */
@@ -645,14 +638,6 @@ def feedback_page():
                 justify-content: space-around; /* Distribute items evenly with space around them */
                 align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
-            }
-            /* Ensure individual radio options don't have extra margins */
-            div[data-testid="stHorizontalRadio"] > label {
-                margin: 0px !important; /* Remove all margins */
-                flex-grow: 1; /* Allow labels to grow and fill space */
-                display: flex; /* Make label a flex container */
-                justify-content: center; /* Center content (radio circle) horizontally */
-                align-items: center; /* Center content (radio circle) vertically */
             }
         </style>
     """, unsafe_allow_html=True)
