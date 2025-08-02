@@ -236,8 +236,8 @@ def survey_page():
             st.warning("SAM Model image not found. Make sure it's in an 'images' subfolder.")
 
         # SAM sliders now start at 0
-        responses['valence'] = st.slider("Valence (Unpleasant ← → Pleasant)", 1, 9, 0, key="valence_slider")
-        responses['arousal'] = st.slider("Arousal (Calm ← → Excited)", 1, 9, 0, key="arousal_slider")
+        responses['valence'] = st.slider("Valence (Unpleasant ← → Pleasant)", 0, 9, 0, key="valence_slider")
+        responses['arousal'] = st.slider("Arousal (Calm ← → Excited)", 0, 9, 0, key="arousal_slider")
         
         submitted = st.form_submit_button("Next")
         if submitted:
@@ -332,9 +332,10 @@ def personality_and_ai_survey_page():
             div[data-testid="stHorizontalRadio"] {
                 display: flex; /* Use flexbox */
                 flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                justify-content: space-around; /* Distribute items evenly */
+                justify-content: space-between; /* Distribute items evenly, pushing first/last to edges */
                 align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
+                padding: 0 5px; /* Add small horizontal padding to keep circles off the edge */
             }
             /* Ensure individual radio options don't have extra margins */
             div[data-testid="stHorizontalRadio"] > label {
@@ -634,9 +635,10 @@ def feedback_page():
             div[data-testid="stHorizontalRadio"] {
                 display: flex; /* Use flexbox */
                 flex-wrap: nowrap; /* Prevent radio options from wrapping to next line */
-                justify-content: space-around; /* Distribute items evenly */
+                justify-content: space-between; /* Distribute items evenly, pushing first/last to edges */
                 align-items: center; /* Align items vertically (circles) */
                 width: 100%; /* Take full width of its parent column */
+                padding: 0 5px; /* Add small horizontal padding to keep circles off the edge */
             }
             /* Ensure individual radio options don't have extra margins */
             div[data-testid="stHorizontalRadio"] > label {
