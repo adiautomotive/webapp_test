@@ -1,3 +1,4 @@
+
 import streamlit as st
 from openai import OpenAI
 import json
@@ -250,43 +251,20 @@ def survey_page():
                 st.rerun()
 
 # ------------------------
-# Page 2: Personality and AI Survey
+# Page 2: Personality and AI Survey (with Dropdowns)
 # ------------------------
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
-    # This CSS hides the labels and aligns the radio buttons into a grid.
-    st.markdown("""
-        <style>
-            /* This targets the container for the horizontal radio buttons */
-            div[data-testid="stHorizontalRadio"] {
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
-            }
-
-            /* This targets each individual radio button's label (which acts as its container) */
-            div[data-testid="stHorizontalRadio"] > label {
-                flex: 1;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin: 0;
-                padding: 0;
-            }
-
-            /* This hides the default text label for each radio button */
-            div[data-testid="stHorizontalRadio"] > label > div[data-testid="stMarkdownContainer"] > p {
-                display: none;
-            }
-            
-            /* General styling for the matrix headers and questions for alignment */
-            .matrix-header-text { text-align: center; font-weight: bold; font-size: 0.9em; padding: 4px; }
-            .matrix-row-question { display: flex; align-items: center; height: 50px; padding-right: 10px;}
-        </style>
-    """, unsafe_allow_html=True)
-
-    likert_options = ["Strongly Disagree", "Somewhat Disagree", "Neither Agree or Disagree", "Somewhat Agree", "Strongly Agree"]
+    # Define the options for the dropdowns. We add a default first option.
+    likert_options = [
+        "- Please select -", 
+        "Strongly Disagree", 
+        "Somewhat Disagree", 
+        "Neither Agree or Disagree", 
+        "Somewhat Agree", 
+        "Strongly Agree"
+    ]
     
     matrix_questions = {
         "Please rate the following statement: I see myself as someone who...": [
@@ -312,50 +290,33 @@ def personality_and_ai_survey_page():
     
     with st.form("personality_survey_form"):
         responses = {}
-        all_questions_answered = True
+        validation_passed = True
         
         for section, questions in matrix_questions.items():
             st.subheader(section)
-            
-            # Define column ratios: ~2.5 for question, 1 for each option
-            col_ratios = [2.5] + [1] * len(likert_options)
-            
-            # Render header row
-            header_cols = st.columns(col_ratios)
-            for i, option in enumerate(likert_options):
-                with header_cols[i + 1]:
-                    st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
-            st.divider()
-
-            # Render question rows
-            for stmt_idx, stmt in enumerate(questions):
-                row_cols = st.columns(col_ratios)
+            for i, question in enumerate(questions):
+                # Create a dropdown for each question
+                selected_value = st.selectbox(
+                    label=question,
+                    options=likert_options,
+                    index=0,  # Default to "- Please select -"
+                    key=f"personality_{section}_{i}"
+                )
                 
-                with row_cols[0]:
-                    st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
-                
-                # Place the single radio widget in the second column, which spans the area of the option headers
-                with row_cols[1].container():
-                    selected_value = st.radio(
-                        label=stmt, # Hidden label
-                        options=likert_options, 
-                        index=None,
-                        key=f"q_{section}_{stmt_idx}",
-                        horizontal=True,
-                        label_visibility="collapsed"
-                    )
-                    
-                    responses[stmt] = selected_value
-                    if selected_value is None:
-                        all_questions_answered = False
+                responses[question] = selected_value
+                # Check if the user has made a selection
+                if selected_value == "- Please select -":
+                    validation_passed = False
             st.markdown("---")
 
         submitted = st.form_submit_button("Next")
         if submitted:
-            if not all_questions_answered:
+            if not validation_passed:
                 st.error("Please answer all questions before proceeding.")
             else:
-                st.session_state.survey_responses.update(responses)
+                # Filter out the placeholder text before saving
+                final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
+                st.session_state.survey_responses.update(final_responses)
                 st.session_state.page = 3
                 st.rerun()
 
@@ -462,21 +423,20 @@ def page4():
             st.rerun()
 
 # ------------------------
-# Page 6: Post-Task Feedback
+# Page 6: Post-Task Feedback (with Dropdowns)
 # ------------------------
 def feedback_page():
     st.title("Post-Task Feedback")
 
-    # This CSS hides the labels and aligns the radio buttons into a grid.
-    st.markdown("""
-        <style>
-            div[data-testid="stHorizontalRadio"] { display: flex; justify-content: space-between; width: 100%; }
-            div[data-testid="stHorizontalRadio"] > label { flex: 1; display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; }
-            div[data-testid="stHorizontalRadio"] > label > div[data-testid="stMarkdownContainer"] > p { display: none; }
-            .matrix-header-text { text-align: center; font-weight: bold; font-size: 0.9em; padding: 4px; }
-            .matrix-row-question { display: flex; align-items: center; height: 50px; padding-right: 10px;}
-        </style>
-    """, unsafe_allow_html=True)
+    # Define the options for the dropdowns.
+    likert_options = [
+        "- Please select -",
+        "Strongly Disagree", 
+        "Somewhat Disagree", 
+        "Neither Agree nor Disagree", 
+        "Somewhat Agree", 
+        "Strongly Agree"
+    ]
 
     matrix_questions = {
         "Feedback on the Writing Process": [
@@ -495,34 +455,23 @@ def feedback_page():
         ],
     }
     
-    likert_options = ["Strongly Disagree", "Somewhat Disagree", "Neither Agree nor Disagree", "Somewhat Agree", "Strongly Agree"]
-    
     with st.form("feedback_form"):
         responses = {}
-        all_feedback_answered = True
+        validation_passed = True
         
         for section, questions in matrix_questions.items():
             st.subheader(section)
-            col_ratios = [2.5] + [1] * len(likert_options)
-            
-            header_cols = st.columns(col_ratios)
-            for i, option in enumerate(likert_options):
-                with header_cols[i + 1]:
-                    st.markdown(f'<p class="matrix-header-text">{option}</p>', unsafe_allow_html=True)
-            st.divider()
-
-            for stmt_idx, stmt in enumerate(questions):
-                row_cols = st.columns(col_ratios)
-                with row_cols[0]:
-                    st.markdown(f'<div class="matrix-row-question">{stmt}</div>', unsafe_allow_html=True)
-                with row_cols[1].container():
-                    selected_value = st.radio(
-                        label=stmt, options=likert_options, index=None, key=f"fb_{section}_{stmt_idx}",
-                        horizontal=True, label_visibility="collapsed"
-                    )
-                    responses[stmt] = selected_value
-                    if selected_value is None:
-                        all_feedback_answered = False
+            for i, question in enumerate(questions):
+                # Create a dropdown for each question
+                selected_value = st.selectbox(
+                    label=question,
+                    options=likert_options,
+                    index=0,
+                    key=f"feedback_{section}_{i}"
+                )
+                responses[question] = selected_value
+                if selected_value == "- Please select -":
+                    validation_passed = False
             st.markdown("---")
 
         st.subheader("Post-Task Emotional State (SAM)")
@@ -534,14 +483,16 @@ def feedback_page():
 
         submitted = st.form_submit_button("Finish")
         if submitted:
-            if not all_feedback_answered:
+            if not validation_passed:
                 st.error("Please answer all feedback questions.")
             elif responses['valence_post'] == 0:
                 st.error("Please select a value for Valence (post-task).")
             elif responses['arousal_post'] == 0:
                 st.error("Please select a value for Arousal (post-task).")
             else:
-                st.session_state.feedback_responses = responses
+                # Filter out placeholder text before saving
+                final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
+                st.session_state.feedback_responses = final_responses
                 save_chat_to_file()
                 st.session_state.page = 7
                 st.rerun()
