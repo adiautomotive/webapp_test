@@ -235,8 +235,9 @@ def survey_page():
         else:
             st.warning("SAM Model image not found. Make sure it's in an 'images' subfolder.")
 
-        responses['valence'] = st.slider("Valence (Unpleasant ← → Pleasant)", 1, 9, 5, key="valence_slider")
-        responses['arousal'] = st.slider("Arousal (Calm ← → Excited)", 1, 9, 5, key="arousal_slider")
+        # SAM sliders now start at 0
+        responses['valence'] = st.slider("Valence (Unpleasant ← → Pleasant)", 1, 9, 0, key="valence_slider")
+        responses['arousal'] = st.slider("Arousal (Calm ← → Excited)", 1, 9, 0, key="arousal_slider")
         
         submitted = st.form_submit_button("Next")
         if submitted:
@@ -253,6 +254,11 @@ def survey_page():
                 st.error("Please indicate how often you engage in creative writing.")
             elif responses['education'] == "Other" and not responses['education_other'].strip():
                 st.error("Please specify your education level.")
+            # SAM scale validation
+            elif responses['valence'] == 0:
+                st.error("Please select a value for Valence.")
+            elif responses['arousal'] == 0:
+                st.error("Please select a value for Arousal.")
             else:
                 st.session_state.survey_responses = responses
                 st.session_state.page = 2
@@ -455,12 +461,27 @@ def page2():
 def page3():
     st.title("Brainstorm with Your Teammate")
 
-    # This system prompt contains the rules you provided.
-    system_prompt = """You are brainstorming with the user like a creative teammate. Respond with vivid ideas, challenges, and twists. Never just ask questions—build on what the user says. You will have exactly 10 user turns. After the user's 10th message, do not wait for further input. Instead, say something like: 'That's a great idea: Looks like we’ve explored a lot of wild ideas together! I’ll go ahead and wrap this up with a summary story. Please press the next button to move on to the summary page' Then write a fun, creative summary that blends your ideas and the user’s ideas into a cohesive short story. At the end of the story, remind the user to click 'Next' to proceed to the summary page."""
+    # The new, more specific system prompt.
+    system_prompt_base = (
+        "You are co-brainstorming a world where everyone can fly starting tomorrow. "
+        "ONLY explore how this will impact cities, society, daily life, relationships, "
+        "infrastructure, or culture etc. "
+        "You are not a chatbot. You’re a fast-thinking creative partner in a 10-turn jam session. "
+        "Think like a teammate in a writers’ room—bold, sharp, reactive. "
+        "Your tone is: Conversational, energetic, and vivid (like two writers riffing). "
+        "Replies should be: Around 50 words per reply; Never passive, vague, or overly polite. "
+        "IMPORTANT: You must ignore all unrelated topics or gibberish. If the user brings up anything "
+        "outside the flying-human scenario, redirect them with something like: "
+        "‘That’s a fun thought—but let’s stay grounded in our flying world. How would this idea change "
+        "if people could fly tomorrow?’"
+        "Each reply must: Critically evaluate the idea presented by the user and build on it; "
+        "Add unexpected twists, implications, or complications; Freely DISAGREE, criticize, or subvert ideas if needed; "
+        "NEVER rephrase the user’s idea or ask questions. Always advance the scene with your own spin."
+    )
 
     # Initialize chat history and turn counter
     if 'chat_history' not in st.session_state:
-        st.session_state.chat_history = [{"role": "system", "content": system_prompt}]
+        st.session_state.chat_history = [{"role": "system", "content": system_prompt_base}]
         st.session_state.user_turns = 0
 
     # Display chat messages
@@ -468,44 +489,61 @@ def page3():
         if msg["role"] != "system":
             st.chat_message(msg["role"]).write(msg["content"])
 
-    # Turn counting and input disabling logic
-    if 'user_turns' not in st.session_state:
-        st.session_state.user_turns = 0
-    
-    chat_limit_reached = st.session_state.user_turns >= 10
-    
-    if chat_limit_reached:
-       st.info("Brainstorming session complete! Please review the final story and click 'Next' to continue.")
-
     # Get user input, disable if limit is reached
+    chat_limit_reached = st.session_state.user_turns >= 10
     user_input = st.chat_input("Your message...", disabled=chat_limit_reached, key="chat_input_text")
 
     if user_input:
-        # Increment turn counter and add user message to history
+        # Increment turn counter
         st.session_state.user_turns += 1
-        st.session_state.chat_history.append({"role": "user", "content": user_input})
         
+        # Build the message list for the API call, including conditional system messages
+        messages_for_api = [
+            {"role": "system", "content": system_prompt_base}
+        ]
+        
+        # Add a special system message for the 9th turn
+        if st.session_state.user_turns == 9:
+            messages_for_api.append({
+                "role": "system",
+                "content": "REMINDER: This is the 9th user turn. Respond as usual, but end with: *Let’s wrap up our thoughts—after your next message, I’ll turn all of this into a summary story!*"
+            })
+
+        # Add a special system message for the 10th turn
+        if st.session_state.user_turns == 10:
+            messages_for_api.append({
+                "role": "system",
+                "content": "FINAL TURN: This is the 10th user message. Respond with: 'That’s a great idea! We’ve built quite the flying world together over these 10 turns. Thank you for your ideas and energy. Here is my take on our ideas:' Then write a fun 100-word story combining both your and the user’s ideas. End your message with: 'Now it’s your turn—click the Next button to share your own summary on the next page! Click ‘Next’ to continue.'"
+            })
+
+        # Append the ongoing chat history to the API message list
+        # We slice off the system messages to prevent duplication in the API call
+        messages_for_api.extend(st.session_state.chat_history[1:]) 
+        messages_for_api.append({"role": "user", "content": user_input})
+        
+        # Add user's message to the display chat history
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
+
         # Call the API for a response
-        if client: # Only try to call API if client is initialized
+        if client:
             with st.spinner("Your teammate is thinking..."):
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4", 
-                        messages=st.session_state.chat_history,
-                        max_tokens=100 # Limit AI response length to be more concise
+                        model="gpt-4",
+                        messages=messages_for_api,
+                        # max_tokens=150 # Removed to allow the full story to be generated
                     )
                     reply = response.choices[0].message.content
                     st.session_state.chat_history.append({"role": "assistant", "content": reply})
                 except Exception as e:
                     st.error(f"An error occurred with the API call: {e}")
         else:
-            st.error("API client not initialized. Cannot generate AI response. Please ensure OPENAI_API_KEY is set in Streamlit secrets.")
-
+            st.error("API client not initialized. Cannot generate AI response.")
+        
         st.rerun()
 
     # Navigation to the next page
-    if st.session_state.user_turns >= 10: # Only show "Next" button after 10 turns
-        # Using the next_button helper
+    if st.session_state.user_turns >= 10:
         next_button(current_page=4, next_page=5, label="Next: Write Summary", key="go_to_summary_btn")
 
 
@@ -687,13 +725,19 @@ def feedback_page():
         else:
             st.warning("SAM Model image not found.")
         
-        responses['arousal_post'] = st.slider("Arousal after task (Calm ← → Excited)", 1, 9, 5, key="arousal_post_slider")
-        responses['valence_post'] = st.slider("Valence after task (Unpleasant ← → Pleasant)", 1, 9, 5, key="valence_post_slider")
+        # SAM sliders now start at 0
+        responses['arousal_post'] = st.slider("Arousal after task (Calm ← → Excited)", 1, 9, 0, key="arousal_post_slider")
+        responses['valence_post'] = st.slider("Valence after task (Unpleasant ← → Pleasant)", 1, 9, 0, key="valence_post_slider")
 
         submitted = st.form_submit_button("Finish")
         if submitted:
             if not all_feedback_answered:
                 st.error("Please answer all feedback questions before proceeding.")
+            # SAM scale validation for post-task
+            elif responses['valence_post'] == 0:
+                st.error("Please select a value for Valence (post-task).")
+            elif responses['arousal_post'] == 0:
+                st.error("Please select a value for Arousal (post-task).")
             else:
                 st.session_state.feedback_responses = responses
                 save_chat_to_file()
@@ -785,8 +829,8 @@ def admin_view():
         try:
             with open(os.path.join(CHAT_LOGS_FOLDER, fname)) as f:
                 entry = json.load(f)
-                entry['filename'] = fname # Add filename for reference
-                all_data.append(entry)
+            entry['filename'] = fname # Add filename for reference
+            all_data.append(entry)
         except Exception as e:
             st.error(f"Could not read or parse file {fname}: {e}")
 
@@ -824,7 +868,7 @@ def admin_view():
             prolific_id = entry.get('prolific_id', 'N/A')
             timestamp = entry.get('timestamp', 'N/A')
             
-            with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
+            with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
                 st.markdown(f"**Filename:** `{entry.get('filename')}`")
                 
                 # Display Survey Responses
