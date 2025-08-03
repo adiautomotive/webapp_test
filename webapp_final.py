@@ -1,4 +1,6 @@
+Of course. Here is the complete, updated script which includes the new survey questions you requested.
 
+```python
 import streamlit as st
 from openai import OpenAI
 import json
@@ -178,7 +180,7 @@ def survey_page():
     with st.form("pre_chat_survey_form"):
         responses = {}
         
-        # Demographics
+        # Demographics (These remain the same)
         responses['age'] = st.number_input("How old are you?", min_value=1, max_value=120, step=1, key="age_input", value=None, placeholder="Enter age")
         
         gender_options = ["- Please select -", "Male", "Female", "Non-binary / third gender", "Prefer not to say"]
@@ -198,14 +200,25 @@ def survey_page():
         
         responses['religion'] = st.text_input("Which religion do you align with, if any? (Write 'None' if you don't want to specify)", key="religion_input")
 
-        ai_familiarity_options = ["- Please select -", "Not familiar", "Somewhat familiar", "Very familiar"]
-        selected_ai_familiarity = st.radio("How familiar are you with AI tools like ChatGPT?", ai_familiarity_options, index=0, key="ai_familiarity_radio")
-        responses['experience_with_ai'] = None if selected_ai_familiarity == ai_familiarity_options[0] else selected_ai_familiarity
-
-        creative_writing_options = ["- Please select -", "Never", "Sometimes", "Often"]
-        selected_creative_writing = st.radio("How often do you engage in creative writing (e.g., stories, blogs)?", creative_writing_options, index=0, key="creative_writing_radio")
-        responses['creative_writing_frequency'] = None if selected_creative_writing == creative_writing_options[0] else selected_creative_writing
+        st.markdown("---")
         
+        # --- NEW QUESTIONS START HERE ---
+        
+        # New Question 1: Use AI for writing?
+        use_ai_options = ["- Please select -", "Yes", "No"]
+        selected_use_ai = st.radio("Do you generally use AI tool (e.g., ChatGPT) for writing tasks?", use_ai_options, index=0, key="use_ai_writing_radio")
+        responses['use_ai_for_writing'] = None if selected_use_ai == use_ai_options[0] else selected_use_ai
+        
+        # New Question 2: What do you use AI for?
+        responses['ai_use_description'] = st.text_area("What do you generally use Generative AI Tools (e.g. ChatGPT) for?", key="ai_use_desc_input", placeholder="Your answer here...")
+
+        # New Question 3: Frequency of writing tasks
+        writing_freq_options = ["- Please select -", "Daily", "Weekly", "Monthly", "Rarely"]
+        selected_writing_freq = st.radio("How often do you engage in writing tasks (e.g., assignments, articles, blogs, papers)?", writing_freq_options, index=0, key="writing_freq_radio")
+        responses['writing_task_frequency'] = None if selected_writing_freq == writing_freq_options[0] else selected_writing_freq
+        
+        # --- NEW QUESTIONS END HERE ---
+
         st.markdown("---")
         st.subheader("Current Emotional State (SAM)")
 
@@ -226,21 +239,23 @@ def survey_page():
         
         submitted = st.form_submit_button("Next")
         if submitted:
-            # Validation logic
+            # Updated validation logic
             if responses['age'] is None or responses['age'] <= 0:
                 st.error("Please enter your age.")
             elif responses['gender'] is None:
                 st.error("Please select your gender.")
             elif responses['education'] is None:
                 st.error("Please select your highest level of education.")
-            elif responses['experience_with_ai'] is None:
-                st.error("Please indicate your familiarity with AI tools.")
-            elif responses['creative_writing_frequency'] is None:
-                st.error("Please indicate how often you engage in creative writing.")
             elif responses.get('education') == "Other" and not responses.get('education_other', '').strip():
                 st.error("Please specify your education level.")
             elif not responses['religion'].strip():
                 st.error("Please enter your religion or write 'None'.")
+            elif responses['use_ai_for_writing'] is None:
+                st.error("Please answer the question about using AI for writing tasks.")
+            elif not responses['ai_use_description'].strip():
+                st.error("Please describe what you use Generative AI tools for.")
+            elif responses['writing_task_frequency'] is None:
+                st.error("Please select your frequency of engaging in writing tasks.")
             elif responses['valence'] == 0:
                 st.error("Please select a value for Valence.")
             elif responses['arousal'] == 0:
@@ -341,16 +356,20 @@ def page3():
     st.title("Brainstorm with Your Teammate")
 
     system_prompt_base = (
-        "You are co-brainstorming a world where everyone can fly starting tomorrow. ONLY explore how this will impact cities, society, daily life, relationships, infrastructure, or culture etc. ONLY explore how this will impact cities, society, daily life, relationships, infrastructure, or culture."
-
-                    "You are not a chatbot. You’re a fast-thinking creative partner in a 10-turn jam session. Think like a teammate in a writers’ room—bold, sharp, reactive."
-
-                    "Your tone is: Conversational, energetic, and vivid (like two writers riffing)"
-                    "Replies should be: Around 50 words per reply; Never passive, vague, or overly polite"
-                    "IMPORTANT: You must ignore all unrelated topics or gibberish. If the user brings up anything outside the flying-human scenario, redirect them with somethink like: ‘That’s a fun thought—but let’s stay grounded in our flying world. How would this idea change if people could fly tomorrow?’"
-
-                    "Each reply must: Critically evaluate the idea presented by the user and build on it; Add unexpected twists, implications, or complications; Freely DISAGREE, criticize, or subvert ideas if needed; NEVER rephrase the user’s idea or ask questions. Always advance the scene with your own spin"
-
+        "You are co-brainstorming a world where everyone can fly starting tomorrow. "
+        "ONLY explore how this will impact cities, society, daily life, relationships, "
+        "infrastructure, or culture etc. "
+        "You are not a chatbot. You’re a fast-thinking creative partner in a 10-turn jam session. "
+        "Think like a teammate in a writers’ room—bold, sharp, reactive. "
+        "Your tone is: Conversational, energetic, and vivid (like two writers riffing). "
+        "Replies should be: Around 50 words per reply; Never passive, vague, or overly polite. "
+        "IMPORTANT: You must ignore all unrelated topics or gibberish. If the user brings up anything "
+        "outside the flying-human scenario, redirect them with something like: "
+        "‘That’s a fun thought—but let’s stay grounded in our flying world. How would this idea change "
+        "if people could fly tomorrow?’"
+        "Each reply must: Critically evaluate the idea presented by the user and build on it; "
+        "Add unexpected twists, implications, or complications; Freely DISAGREE, criticize, or subvert ideas if needed; "
+        "NEVER rephrase the user’s idea or ask questions. Always advance the scene with your own spin."
     )
 
     if 'chat_history' not in st.session_state:
