@@ -269,31 +269,40 @@ def survey_page():
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
-    # Define the options for the dropdowns. We add a default first option.
+    # --- UPDATED LIKERT SCALE OPTIONS ---
     likert_options = [
-        "- Please select -", 
+        "- Please select -",
         "Strongly Disagree", 
-        "Somewhat Disagree", 
-        "Neither Agree or Disagree", 
-        "Somewhat Agree", 
+        "Disagree", 
+        "Neutral", 
+        "Agree", 
         "Strongly Agree"
     ]
     
+    # --- UPDATED QUESTIONS DICTIONARY ---
     matrix_questions = {
         "Please rate the following statement: I see myself as someone who...": [
             "is reserved", "is generally trusting", "tends to be lazy", "is relaxed, handles stress well",
             "has few artistic interests", "is outgoing, sociable", "tends to find faults with others",
-            "does a thorough job", "If you're reading this carefully, select 'Somewhat Agree'.", "gets nervous easily"
+            "does a thorough job", "gets nervous easily"
         ],
         "Work Style Preference": [
             "I prefer to work with other in a group, rather than working alone",
             "If given a choice: I would rather do a job where I can work alone, rather do a job where I have to work with others",
             "Working in a group is better than working alone"
         ],
-        "Please rate each statement regarding Artificial Intelligence (AI) - Trust and Reliance": [ 
-            "Generally I would trust AI", "AI can help me solve many problems", "I think it is a good idea to rely on AI for help",
-            "I may not trust information I get from AI", "AI is reliable", "I would rely on AI"
+        # --- THIS SECTION IS REPLACED ---
+        "How much do you agree or disagree with the following statements?": [ 
+            "Even though I am not an expert in AI, I would still trust the results of an AI system.",
+            "I feel good about using AI for a critical task.",
+            "I believe that I can rely on AI to help me with my work.",
+            "I rarely trust an AI until I have used it for a while.",
+            "Other people around me have a positive attitude towards using AI.",
+            "Other people have a strong influence on my decision to use AI.",
+            "I am wary about using AI because I am not sure what I will get.",
+            "I am reading this carefully, select Agree." # Attention check question
         ],
+        # --- THIS SECTION IS UNCHANGED ---
         "Please rate each statement regarding Artificial Intelligence (AI) - Perceived Creativity": [
             "AI systems can be truly creative.", "AI can generate novel and innovative ideas.",
             "AI can understand and express emotions in a creative context.", "Collaborating with AI can enhance my own creativity.",
