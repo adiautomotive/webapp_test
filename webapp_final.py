@@ -1,6 +1,4 @@
-Of course. Here is the complete, updated script which includes the new survey questions you requested.
 
-```python
 import streamlit as st
 from openai import OpenAI
 import json
