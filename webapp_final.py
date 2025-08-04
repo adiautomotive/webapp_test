@@ -380,7 +380,7 @@ def trust_survey_page():
     ]
     
     trust_questions = {
-        "How much do you agree or disagree with the following statements?": [
+        "Trust in People: How much do you agree or disagree with the following statements?": [
             "Even though I may sometimes suffer the consequences of trusting other people, I still prefer to trust than not to trust them.",
             "I feel good about trusting other people.",
             "I believe that I am generally better off when I do not trust other people than when I trust them.",
@@ -397,8 +397,7 @@ def trust_survey_page():
             "I feel that other people can be relied upon to do what they say they will do.",
             "One cannot expect to be treated fairly by other people."
         ],
-
-        "How much do you agree or disagree with the following statements?": [
+        "Trust in AI: How much do you agree or disagree with the following statements?": [
             "Even though I may sometimes suffer the consequences of trusting AI systems, I still prefer to trust than not to trust them.",
             "I feel good about trusting AI.",
             "I believe that I am generally better off when I do not trust AI systems than when I trust them.",
@@ -408,9 +407,9 @@ def trust_survey_page():
             "I am wary about the capabilities of AI.",
             "if you are reading this carefully, select somewhat agree.", # Attention check
             "AI systems do not have the capabilities that could help me reach my goals.",
-            "I believe that AI has  good intentions.",
+            "I believe that AI has good intentions.",
             "I feel that AI is out to get as much as it can for itself",
-            "I don’t expect that AI  systems are willing to assist and support people.",
+            "I don’t expect that AI systems are willing to assist and support people.",
             "Most AI systems are honest.",
             "I feel that AI systems can be relied upon to do what they say they will do.",
             "One cannot expect to be treated fairly by AI."
