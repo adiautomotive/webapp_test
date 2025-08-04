@@ -270,11 +270,11 @@ def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
     likert_options = [
-        "- Please select -",
+      "- Please select -",
         "Strongly Disagree", 
-        "Disagree", 
-        "Neutral", 
-        "Agree", 
+        "Somewhat Disagree", 
+        "Neither Agree nor Disagree", 
+        "Somewhat Agree", 
         "Strongly Agree"
     ]
     
@@ -327,11 +327,11 @@ def trust_survey_page():
     st.title("Trust Survey")
 
     likert_options = [
-        "- Please select -",
+         "- Please select -",
         "Strongly Disagree", 
-        "Disagree", 
-        "Neutral", 
-        "Agree", 
+        "Somewhat Disagree", 
+        "Neither Agree nor Disagree", 
+        "Somewhat Agree", 
         "Strongly Agree"
     ]
     
@@ -493,7 +493,7 @@ def page3():
 # ------------------------
 def page4():
     st.title("Summary")
-    st.text_area("Please summarize your discussion:", key="summary_text", height=300)
+    st.text_area("Based on the brainstorming session, How will  cities, society, and daily life change if everyone starts flying tomorrow?", key="summary_text", height=300)
     current_summary_text = st.session_state.get("summary_text", "") 
 
     if st.button("Submit Summary", key="submit_summary_btn"):
