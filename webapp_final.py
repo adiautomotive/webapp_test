@@ -269,28 +269,6 @@ def survey_page():
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
-    # --- AESTHETIC CSS ---
-    st.markdown("""
-        <style>
-        /* Target all selectbox containers and give them a red border by default */
-        div[data-testid="stSelectbox"] {
-            border: 2px solid #FF4B4B; /* Red color for unanswered */
-            border-radius: 0.5rem;      /* Rounded corners */
-            padding: 6px;               /* Add some space inside the border */
-        }
-    
-        /* When the user clicks into the selectbox, change the border to green */
-        div[data-testid="stSelectbox"]:focus-within {
-            border-color: #28a745; /* Green color for active/answered */
-        }
-        
-        label.st-emotion-cache-1fplz1s {
-            font-size: 1.1em;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    # ---------------------
-
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
@@ -347,28 +325,6 @@ def personality_and_ai_survey_page():
 # ------------------------
 def trust_survey_page():
     st.title("Trust Survey")
-
-    # --- AESTHETIC CSS ---
-    st.markdown("""
-        <style>
-        /* Target all selectbox containers and give them a red border by default */
-        div[data-testid="stSelectbox"] {
-            border: 2px solid #FF4B4B; /* Red color for unanswered */
-            border-radius: 0.5rem;      /* Rounded corners */
-            padding: 6px;               /* Add some space inside the border */
-        }
-    
-        /* When the user clicks into the selectbox, change the border to green */
-        div[data-testid="stSelectbox"]:focus-within {
-            border-color: #28a745; /* Green color for active/answered */
-        }
-        
-        label.st-emotion-cache-1fplz1s {
-            font-size: 1.1em;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    # ---------------------
 
     likert_options = [
         "- Please select -",
@@ -552,28 +508,6 @@ def page4():
 # ------------------------
 def feedback_page():
     st.title("Post-Task Feedback")
-
-    # --- AESTHETIC CSS ---
-    st.markdown("""
-        <style>
-        /* Target all selectbox containers and give them a red border by default */
-        div[data-testid="stSelectbox"] {
-            border: 2px solid #FF4B4B; /* Red color for unanswered */
-            border-radius: 0.5rem;      /* Rounded corners */
-            padding: 6px;               /* Add some space inside the border */
-        }
-    
-        /* When the user clicks into the selectbox, change the border to green */
-        div[data-testid="stSelectbox"]:focus-within {
-            border-color: #28a745; /* Green color for active/answered */
-        }
-        
-        label.st-emotion-cache-1fplz1s {
-            font-size: 1.1em;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    # ---------------------
 
     likert_options = [
         "- Please select -",
