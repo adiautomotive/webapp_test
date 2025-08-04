@@ -310,11 +310,6 @@ def personality_and_ai_survey_page():
             "I prefer to work with other in a group, rather than working alone",
             "If given a choice: I would rather do a job where I can work alone, rather do a job where I have to work with others",
             "Working in a group is better than working alone"
-        ],
-        "Please rate each statement regarding Artificial Intelligence (AI) - Perceived Creativity": [
-            "AI systems can be truly creative.", "AI can generate novel and innovative ideas.",
-            "AI can understand and express emotions in a creative context.", "Collaborating with AI can enhance my own creativity.",
-            "AI can contribute original content to a creative project."
         ]
     }
     
@@ -401,7 +396,25 @@ def trust_survey_page():
             "Most other people are honest.",
             "I feel that other people can be relied upon to do what they say they will do.",
             "One cannot expect to be treated fairly by other people."
-        ]
+        ],
+
+        "How much do you agree or disagree with the following statements?": [
+            "Even though I may sometimes suffer the consequences of trusting AI systems, I still prefer to trust than not to trust them.",
+            "I feel good about trusting AI.",
+            "I believe that I am generally better off when I do not trust AI systems than when I trust them.",
+            "I rarely trust AI systems because I can’t handle the uncertainty.",
+            "AI systems are competent..",
+            "AI systems have sound knowledge about problems for which they are intended.",
+            "I am wary about the capabilities of AI.",
+            "if you are reading this carefully, select somewhat agree.", # Attention check
+            "AI systems do not have the capabilities that could help me reach my goals.",
+            "I believe that AI has  good intentions.",
+            "I feel that AI is out to get as much as it can for itself",
+            "I don’t expect that AI  systems are willing to assist and support people.",
+            "Most AI systems are honest.",
+            "I feel that AI systems can be relied upon to do what they say they will do.",
+            "One cannot expect to be treated fairly by AI."
+        ] 
     }
 
     with st.form("trust_survey_form"):
