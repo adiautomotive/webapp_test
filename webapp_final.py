@@ -1,4 +1,3 @@
-
 import streamlit as st
 from openai import OpenAI
 import json
@@ -31,16 +30,17 @@ def main():
     if 'page' not in st.session_state:
         st.session_state.page = 0
 
-    # Page routing dictionary
+    # Page routing dictionary with the new page added
     pages = {
-        0: welcome_page, # New Welcome Page (Consent)
-        1: survey_page, # Demographics and initial SAM
-        2: personality_and_ai_survey_page, # Personality, AI Trust/Creativity, Attention Check
-        3: page2, # Instructions
-        4: page3, # Chat page
-        5: page4, # Summary
-        6: feedback_page, # Post-task feedback and final SAM
-        7: page5, # Thank You page
+        0: welcome_page,
+        1: survey_page,
+        2: personality_and_ai_survey_page,
+        3: trust_survey_page, # <-- NEW PAGE
+        4: page2, # Instructions (was 3)
+        5: page3, # Chat page (was 4)
+        6: page4, # Summary (was 5)
+        7: feedback_page, # Post-task feedback (was 6)
+        8: page5, # Thank You page (was 7)
         99: admin_view
     }
     
@@ -48,8 +48,8 @@ def main():
     if page_function:
         page_function()
     else:
-        st.session_state.page = 0 # Default to first page if state is invalid
-        welcome_page() # Use welcome_page as the default
+        st.session_state.page = 0
+        welcome_page()
 
 
 # ------------------------
@@ -264,12 +264,11 @@ def survey_page():
                 st.rerun()
 
 # ------------------------
-# Page 2: Personality and AI Survey (with Dropdowns)
+# MODIFIED Page 2: Personality and AI Survey
 # ------------------------
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
-    # --- UPDATED LIKERT SCALE OPTIONS ---
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
@@ -279,7 +278,6 @@ def personality_and_ai_survey_page():
         "Strongly Agree"
     ]
     
-    # --- UPDATED QUESTIONS DICTIONARY ---
     matrix_questions = {
         "Please rate the following statement: I see myself as someone who...": [
             "is reserved", "is generally trusting", "tends to be lazy", "is relaxed, handles stress well",
@@ -291,18 +289,6 @@ def personality_and_ai_survey_page():
             "If given a choice: I would rather do a job where I can work alone, rather do a job where I have to work with others",
             "Working in a group is better than working alone"
         ],
-        # --- THIS SECTION IS REPLACED ---
-        "How much do you agree or disagree with the following statements?": [ 
-            "Even though I am not an expert in AI, I would still trust the results of an AI system.",
-            "I feel good about using AI for a critical task.",
-            "I believe that I can rely on AI to help me with my work.",
-            "I rarely trust an AI until I have used it for a while.",
-            "Other people around me have a positive attitude towards using AI.",
-            "Other people have a strong influence on my decision to use AI.",
-            "I am wary about using AI because I am not sure what I will get.",
-            "I am reading this carefully, select Agree." # Attention check question
-        ],
-        # --- THIS SECTION IS UNCHANGED ---
         "Please rate each statement regarding Artificial Intelligence (AI) - Perceived Creativity": [
             "AI systems can be truly creative.", "AI can generate novel and innovative ideas.",
             "AI can understand and express emotions in a creative context.", "Collaborating with AI can enhance my own creativity.",
@@ -317,16 +303,13 @@ def personality_and_ai_survey_page():
         for section, questions in matrix_questions.items():
             st.subheader(section)
             for i, question in enumerate(questions):
-                # Create a dropdown for each question
                 selected_value = st.selectbox(
                     label=question,
                     options=likert_options,
-                    index=0,  # Default to "- Please select -"
+                    index=0,
                     key=f"personality_{section}_{i}"
                 )
-                
                 responses[question] = selected_value
-                # Check if the user has made a selection
                 if selected_value == "- Please select -":
                     validation_passed = False
             st.markdown("---")
@@ -336,14 +319,78 @@ def personality_and_ai_survey_page():
             if not validation_passed:
                 st.error("Please answer all questions before proceeding.")
             else:
-                # Filter out the placeholder text before saving
                 final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
                 st.session_state.survey_responses.update(final_responses)
+                # Navigate to the new trust survey page (page 3)
                 st.session_state.page = 3
                 st.rerun()
 
 # ------------------------
-# Page 3: Instructions
+# NEW Page 3: Trust Survey
+# ------------------------
+def trust_survey_page():
+    st.title("Trust Survey")
+
+    likert_options = [
+        "- Please select -",
+        "Strongly Disagree", 
+        "Disagree", 
+        "Neutral", 
+        "Agree", 
+        "Strongly Agree"
+    ]
+    
+    trust_questions = {
+        "How much do you agree or disagree with the following statements?": [
+            "Even though I may sometimes suffer the consequences of trusting other people, I still prefer to trust than not to trust them.",
+            "I feel good about trusting other people.",
+            "I believe that I am generally better off when I do not trust other people than when I trust them.",
+            "I rarely trust other people because I can't handle the uncertainty.",
+            "Other people are competent.",
+            "Other people have sound knowledge about problems which they are working on.",
+            "I am wary about other people's capabilities.",
+            "I am reading this carefully and will choose Strongly Disagree.", # Attention check
+            "Other people do not have the capabilities that could help me reach my goals.",
+            "I believe that other people have good intentions.",
+            "I feel that other people are out to get as much as they can for themselves.",
+            "I don't expect that people are willing to assist and support other people.",
+            "Most other people are honest.",
+            "I feel that other people can be relied upon to do what they say they will do.",
+            "One cannot expect to be treated fairly by other people."
+        ]
+    }
+
+    with st.form("trust_survey_form"):
+        responses = {}
+        validation_passed = True
+        
+        for section, questions in trust_questions.items():
+            st.subheader(section)
+            for i, question in enumerate(questions):
+                selected_value = st.selectbox(
+                    label=question,
+                    options=likert_options,
+                    index=0,
+                    key=f"trust_{section}_{i}"
+                )
+                responses[question] = selected_value
+                if selected_value == "- Please select -":
+                    validation_passed = False
+            st.markdown("---")
+
+        submitted = st.form_submit_button("Next")
+        if submitted:
+            if not validation_passed:
+                st.error("Please answer all questions before proceeding.")
+            else:
+                final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
+                st.session_state.survey_responses.update(final_responses)
+                # Navigate to the next page (Instructions, which is now page 4)
+                st.session_state.page = 4
+                st.rerun()
+
+# ------------------------
+# Page 4: Instructions
 # ------------------------
 def page2():
     st.title("Instructions")
@@ -353,11 +400,11 @@ def page2():
         - **Your Task:** Brainstorm ideas back and forth with an AI assistant for a limited number of turns.
         - **Goal:** After the brainstorming session concludes, you will be asked to write a short summary of your discussion.
         """)
-    next_button(current_page=3, next_page=4, label="Start Brainstorming", key="start_brainstorming_btn")
+    next_button(current_page=4, next_page=5, label="Start Brainstorming", key="start_brainstorming_btn")
 
 
 # ------------------------
-# Page 4: Chat Interface 
+# Page 5: Chat Interface 
 # ------------------------
 def page3():
     st.title("Brainstorm with Your Teammate")
@@ -426,11 +473,11 @@ def page3():
         st.rerun()
 
     if st.session_state.user_turns >= 10:
-        next_button(current_page=4, next_page=5, label="Next: Write Summary", key="go_to_summary_btn")
+        next_button(current_page=5, next_page=6, label="Next: Write Summary", key="go_to_summary_btn")
 
 
 # ------------------------
-# Page 5: Summary
+# Page 6: Summary
 # ------------------------
 def page4():
     st.title("Summary")
@@ -441,16 +488,15 @@ def page4():
         if current_summary_text.strip() == "":
             st.error("Please provide a summary before proceeding.")
         else:
-            st.session_state.page = 6
+            st.session_state.page = 7
             st.rerun()
 
 # ------------------------
-# Page 6: Post-Task Feedback (with Dropdowns)
+# Page 7: Post-Task Feedback
 # ------------------------
 def feedback_page():
     st.title("Post-Task Feedback")
 
-    # Define the options for the dropdowns.
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
@@ -484,7 +530,6 @@ def feedback_page():
         for section, questions in matrix_questions.items():
             st.subheader(section)
             for i, question in enumerate(questions):
-                # Create a dropdown for each question
                 selected_value = st.selectbox(
                     label=question,
                     options=likert_options,
@@ -512,15 +557,14 @@ def feedback_page():
             elif responses['arousal_post'] == 0:
                 st.error("Please select a value for Arousal (post-task).")
             else:
-                # Filter out placeholder text before saving
                 final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
                 st.session_state.feedback_responses = final_responses
                 save_chat_to_file()
-                st.session_state.page = 7
+                st.session_state.page = 8
                 st.rerun()
 
 # ------------------------
-# Page 7: Acknowledgement (Final Page)
+# Page 8: Acknowledgement (Final Page)
 # ------------------------
 def page5():
     st.title("Thank You!")
