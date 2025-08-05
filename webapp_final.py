@@ -270,11 +270,11 @@ def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
 
     likert_options = [
-      "- Please select -",
+        "- Please select -",
         "Strongly Disagree", 
-        "Somewhat Disagree", 
-        "Neither Agree nor Disagree", 
-        "Somewhat Agree", 
+        "Disagree", 
+        "Neutral", 
+        "Agree", 
         "Strongly Agree"
     ]
     
@@ -327,11 +327,11 @@ def trust_survey_page():
     st.title("Trust Survey")
 
     likert_options = [
-         "- Please select -",
+        "- Please select -",
         "Strongly Disagree", 
-        "Somewhat Disagree", 
-        "Neither Agree nor Disagree", 
-        "Somewhat Agree", 
+        "Disagree", 
+        "Neutral", 
+        "Agree", 
         "Strongly Agree"
     ]
     
@@ -493,15 +493,23 @@ def page3():
 # ------------------------
 def page4():
     st.title("Summary")
-    st.text_area("Based on the brainstorming session, How will  cities, society, and daily life change if everyone starts flying tomorrow?", key="summary_text", height=300)
-    current_summary_text = st.session_state.get("summary_text", "") 
+    st.text_area(
+        "Based on the brainstorming session, how will cities, society, and daily life change if everyone starts flying tomorrow?", 
+        key="summary_text", 
+        height=300
+    )
 
     if st.button("Submit Summary", key="submit_summary_btn"):
-        if current_summary_text.strip() == "":
+        # Check the most current value from session_state right after the button is clicked
+        summary_text = st.session_state.get("summary_text", "")
+        
+        if not summary_text.strip():
             st.error("Please provide a summary before proceeding.")
         else:
+            # The data is already in st.session_state.summary_text, so we just navigate
             st.session_state.page = 7
             st.rerun()
+
 
 # ------------------------
 # Page 7: Post-Task Feedback
@@ -509,12 +517,13 @@ def page4():
 def feedback_page():
     st.title("Post-Task Feedback")
 
+    # Corrected likert_options for consistency with other survey pages
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
-        "Somewhat Disagree", 
-        "Neither Agree nor Disagree", 
-        "Somewhat Agree", 
+        "Disagree", 
+        "Neutral", 
+        "Agree", 
         "Strongly Agree"
     ]
 
