@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import pandas as pd
 import io
+import time
 
 # ------------------------
 # Constants
@@ -16,10 +17,8 @@ CHAT_LOGS_FOLDER = "chat_logs"
 # ChatGPT API Setup
 # ------------------------
 try:
-    # It is recommended to use Streamlit secrets for your API key
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 except Exception as e:
-    # This will prevent the app from crashing if the API key is not set
     client = None
     st.warning("OpenAI API key not found in Streamlit secrets. Chat functionality will be disabled. Please set OPENAI_API_KEY in .streamlit/secrets.toml")
 
@@ -30,17 +29,16 @@ def main():
     if 'page' not in st.session_state:
         st.session_state.page = 0
 
-    # Page routing dictionary with the new page added
     pages = {
         0: welcome_page,
         1: survey_page,
         2: personality_and_ai_survey_page,
-        3: trust_survey_page, # <-- NEW PAGE
-        4: page2, # Instructions (was 3)
-        5: page3, # Chat page (was 4)
-        6: page4, # Summary (was 5)
-        7: feedback_page, # Post-task feedback (was 6)
-        8: page5, # Thank You page (was 7)
+        3: trust_survey_page,
+        4: page2,
+        5: page3,
+        6: page4,
+        7: feedback_page,
+        8: page5,
         99: admin_view
     }
     
@@ -51,12 +49,10 @@ def main():
         st.session_state.page = 0
         welcome_page()
 
-
 # ------------------------
-# Helper for Next Button (positioned bottom right)
+# Helper for Next Button
 # ------------------------
 def next_button(current_page, next_page, label="Next", key="next_page_btn"):
-    # Custom CSS for button positioning
     st.markdown(
         """
         <style>
@@ -74,7 +70,7 @@ def next_button(current_page, next_page, label="Next", key="next_page_btn"):
         st.rerun()
 
 # ------------------------
-# Chat History Persistence
+# Chat History Persistence (FIXED)
 # ------------------------
 def save_chat_to_file():
     prolific_id = st.session_state.get("prolific_id", "anonymous")
@@ -82,19 +78,21 @@ def save_chat_to_file():
     os.makedirs(CHAT_LOGS_FOLDER, exist_ok=True)
     filename = f"chat_{prolific_id}_{timestamp}.json"
 
+    # Get summary from session state (FIXED)
+    summary = st.session_state.get("summary_text", "")
+    
     data = {
         "prolific_id": prolific_id,
         "timestamp": timestamp,
         "survey_responses": st.session_state.get("survey_responses", {}),
         "chat_history": st.session_state.get("chat_history", []),
-        "summary": st.session_state.get("summary_text", ""),
+        "summary": summary,  # Store the actual summary
         "feedback": st.session_state.get("feedback_responses", {})
     }
 
     file_path = os.path.join(CHAT_LOGS_FOLDER, filename)
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
-
 
 # ------------------------
 # Page 0: Welcome Page with Consent
@@ -168,7 +166,6 @@ def welcome_page():
                 else:
                     st.error("Incorrect password")
 
-
 # ------------------------
 # Page 1: Pre-Activity Survey
 # ------------------------
@@ -178,7 +175,6 @@ def survey_page():
     with st.form("pre_chat_survey_form"):
         responses = {}
         
-        # Demographics (These remain the same)
         responses['age'] = st.number_input("How old are you?", min_value=1, max_value=120, step=1, key="age_input", value=None, placeholder="Enter age")
         
         gender_options = ["- Please select -", "Male", "Female", "Non-binary / third gender", "Prefer not to say"]
@@ -200,23 +196,16 @@ def survey_page():
 
         st.markdown("---")
         
-        # --- NEW QUESTIONS START HERE ---
-        
-        # New Question 1: Use AI for writing?
         use_ai_options = ["- Please select -", "Yes", "No"]
         selected_use_ai = st.radio("Do you generally use AI tool (e.g., ChatGPT) for writing tasks?", use_ai_options, index=0, key="use_ai_writing_radio")
         responses['use_ai_for_writing'] = None if selected_use_ai == use_ai_options[0] else selected_use_ai
         
-        # New Question 2: What do you use AI for?
         responses['ai_use_description'] = st.text_area("What do you generally use Generative AI Tools (e.g. ChatGPT) for?", key="ai_use_desc_input", placeholder="Your answer here...")
 
-        # New Question 3: Frequency of writing tasks
         writing_freq_options = ["- Please select -", "Daily", "Weekly", "Monthly", "Rarely"]
         selected_writing_freq = st.radio("How often do you engage in writing tasks (e.g., assignments, articles, blogs, papers)?", writing_freq_options, index=0, key="writing_freq_radio")
         responses['writing_task_frequency'] = None if selected_writing_freq == writing_freq_options[0] else selected_writing_freq
         
-        # --- NEW QUESTIONS END HERE ---
-
         st.markdown("---")
         st.subheader("Current Emotional State (SAM)")
 
@@ -237,7 +226,6 @@ def survey_page():
         
         submitted = st.form_submit_button("Next")
         if submitted:
-            # Updated validation logic
             if responses['age'] is None or responses['age'] <= 0:
                 st.error("Please enter your age.")
             elif responses['gender'] is None:
@@ -264,7 +252,7 @@ def survey_page():
                 st.rerun()
 
 # ------------------------
-# MODIFIED Page 2: Personality and AI Survey
+# Page 2: Personality and AI Survey
 # ------------------------
 def personality_and_ai_survey_page():
     st.title("Follow-up Survey")
@@ -316,12 +304,11 @@ def personality_and_ai_survey_page():
             else:
                 final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
                 st.session_state.survey_responses.update(final_responses)
-                # Navigate to the new trust survey page (page 3)
                 st.session_state.page = 3
                 st.rerun()
 
 # ------------------------
-# NEW Page 3: Trust Survey
+# Page 3: Trust Survey
 # ------------------------
 def trust_survey_page():
     st.title("Trust Survey")
@@ -397,7 +384,6 @@ def trust_survey_page():
             else:
                 final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
                 st.session_state.survey_responses.update(final_responses)
-                # Navigate to the next page (Instructions, which is now page 4)
                 st.session_state.page = 4
                 st.rerun()
 
@@ -413,7 +399,6 @@ def page2():
         - **Goal:** After the brainstorming session concludes, you will be asked to write a short summary of your discussion.
         """)
     next_button(current_page=4, next_page=5, label="Start Brainstorming", key="start_brainstorming_btn")
-
 
 # ------------------------
 # Page 5: Chat Interface 
@@ -487,30 +472,36 @@ def page3():
     if st.session_state.user_turns >= 10:
         next_button(current_page=5, next_page=6, label="Next: Write Summary", key="go_to_summary_btn")
 
-
 # ------------------------
-# Page 6: Summary (CORRECTED)
+# Page 6: Summary (FIXED)
 # ------------------------
 def page4():
     st.title("Summary")
-    st.text_area(
-        "Based on the brainstorming session, how will cities, society, and daily life change if everyone starts flying tomorrow?", 
-        key="summary_text", 
-        height=300
-    )
 
-    if st.button("Submit Summary", key="submit_summary_btn"):
-        # CRITICAL FIX: Check the session state *after* the button is clicked.
-        summary_input = st.session_state.get("summary_text", "")
+    # Initialize session state for summary if not present
+    if 'summary_text' not in st.session_state:
+        st.session_state.summary_text = ""
+    
+    with st.form("summary_form"):
+        summary_input = st.text_area(
+            "Based on the brainstorming session, how will cities, society, and daily life change if everyone starts flying tomorrow?",
+            height=300,
+            value=st.session_state.summary_text,  # Show current value
+            key="summary_widget"
+        )
         
-        if not summary_input.strip():
-            st.error("Please provide a summary before proceeding.")
-        else:
-            # The value is already correctly stored in st.session_state.summary_text by the widget's key.
-            # We just need to navigate to the next page.
-            st.session_state.page = 7
-            st.rerun()
+        submitted = st.form_submit_button("Submit Summary")
 
+        if submitted:
+            if not summary_input.strip():
+                st.error("Please provide a summary before proceeding.")
+            else:
+                # Store summary in session state
+                st.session_state.summary_text = summary_input
+                st.success("Summary Saved! Proceeding...")
+                time.sleep(1)
+                st.session_state.page = 7
+                st.rerun()
 
 # ------------------------
 # Page 7: Post-Task Feedback
@@ -518,7 +509,6 @@ def page4():
 def feedback_page():
     st.title("Post-Task Feedback")
 
-    # Corrected likert_options for consistency with other survey pages
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
@@ -581,12 +571,12 @@ def feedback_page():
             else:
                 final_responses = {k: v for k, v in responses.items() if v != "- Please select -"}
                 st.session_state.feedback_responses = final_responses
-                save_chat_to_file()
+                save_chat_to_file()  # Save all data including summary
                 st.session_state.page = 8
                 st.rerun()
 
 # ------------------------
-# Page 8: Acknowledgement (Final Page)
+# Page 8: Acknowledgement
 # ------------------------
 def page5():
     st.title("Thank You!")
@@ -623,21 +613,24 @@ def convert_data_to_csv(data_list):
     return df[existing_cols].to_csv(index=False).encode('utf-8')
 
 # ------------------------
-# Helper for Admin Page: Convert SUMMARIES to CSV
+# Helper for Admin Page: Convert SUMMARIES to CSV (ENHANCED)
 # ------------------------
 def convert_summaries_to_csv(data_list):
     if not data_list:
         return b""
     
-    # Filter for entries that have a non-empty summary
-    summary_data = [
-        {
-            'prolific_id': entry.get('prolific_id', 'N/A'),
-            'timestamp': entry.get('timestamp', 'N/A'),
-            'summary': entry.get('summary', '')
-        }
-        for entry in data_list if entry.get('summary', '').strip()
-    ]
+    summary_data = []
+    for entry in data_list:
+        # Only include entries with non-empty summaries
+        if entry.get('summary', '').strip():
+            summary_data.append({
+                'prolific_id': entry.get('prolific_id', 'N/A'),
+                'timestamp': entry.get('timestamp', 'N/A'),
+                'summary': entry.get('summary', ''),
+                'feedback_quality': entry.get('feedback', {}).get('I am satisfied with the quality of the final outcome', 'N/A'),
+                'feedback_ownership': entry.get('feedback', {}).get('I feel a sense of ownership of the final outcome', 'N/A'),
+                'filename': entry.get('filename', 'N/A')
+            })
     
     if not summary_data:
         return b""
@@ -645,9 +638,8 @@ def convert_summaries_to_csv(data_list):
     df = pd.DataFrame(summary_data)
     return df.to_csv(index=False).encode('utf-8')
 
-
 # ------------------------
-# Page 99: Admin Dashboard
+# Page 99: Admin Dashboard (ENHANCED)
 # ------------------------
 def admin_view():
     st.title("Admin Dashboard")
@@ -669,10 +661,10 @@ def admin_view():
         except Exception as e:
             st.error(f"Could not read or parse file {fname}: {e}")
 
-    # --- Create Tabs for Different Views ---
+    # Create tabs for different views
     tab1, tab2 = st.tabs(["All Submissions", "Summaries Dashboard"])
 
-    # --- Tab 1: All Submissions (Original View) ---
+    # Tab 1: All Submissions
     with tab1:
         st.header("All Submissions")
         search_query = st.text_input("Search by Prolific ID (leave empty for all):", key="admin_search_input")
@@ -719,39 +711,74 @@ def admin_view():
                         st.subheader("Feedback Responses")
                         st.json(entry['feedback'], expanded=False)
 
-    # --- Tab 2: Summaries Dashboard ---
+    # Tab 2: Summaries Dashboard (NEW)
     with tab2:
         st.header("Summaries Dashboard")
         
-        # Filter data to only include entries with a summary
+        # Filter data to only include entries with summaries
         summary_entries = [d for d in all_data if d.get('summary', '').strip()]
         
-        csv_data_summaries = convert_summaries_to_csv(summary_entries)
+        # Filtering options
+        st.subheader("Filter Summaries")
+        col1, col2 = st.columns(2)
+        with col1:
+            min_length = st.number_input("Minimum Summary Length (characters)", min_value=0, value=50)
+        with col2:
+            quality_filter = st.selectbox("Satisfaction Level", 
+                                         ["All", "Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree"])
+        
+        # Apply filters
+        filtered_summaries = []
+        for entry in summary_entries:
+            summary = entry.get('summary', '')
+            feedback_quality = entry.get('feedback', {}).get('I am satisfied with the quality of the final outcome', '')
+            
+            # Apply length filter
+            if len(summary) < min_length:
+                continue
+                
+            # Apply quality filter
+            if quality_filter != "All":
+                if feedback_quality != quality_filter:
+                    continue
+                    
+            filtered_summaries.append(entry)
+        
+        csv_data_summaries = convert_summaries_to_csv(filtered_summaries)
 
         st.download_button(
-            label="📥 Download All Summaries as CSV", data=csv_data_summaries,
+            label="📥 Download Filtered Summaries as CSV", data=csv_data_summaries,
             file_name=f"summaries_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-            mime='text/csv', disabled=not summary_entries
+            mime='text/csv', disabled=not filtered_summaries
         )
         
         st.markdown("---")
-        st.header(f"Displaying {len(summary_entries)} Summaries")
+        st.header(f"Displaying {len(filtered_summaries)} of {len(summary_entries)} Summaries")
 
-        if not summary_entries:
-            st.info("No summaries have been submitted yet.")
+        if not filtered_summaries:
+            st.info("No summaries match your filter criteria.")
         else:
-            for entry in summary_entries:
+            for idx, entry in enumerate(filtered_summaries):
                 prolific_id = entry.get('prolific_id', 'N/A')
                 timestamp = entry.get('timestamp', 'N/A')
+                summary = entry.get('summary', '')
                 
-                with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
-                    st.text_area(
-                        "Summary", 
-                        value=entry['summary'], 
-                        height=200, 
-                        disabled=True, 
-                        key=f"summary_display_{prolific_id}_{timestamp}"
-                    )
+                with st.expander(f"Summary #{idx+1} | ID: {prolific_id} | Time: {timestamp}"):
+                    st.subheader("Summary Content")
+                    st.write(summary)
+                    
+                    st.subheader("Participant Feedback")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.metric("Satisfaction", 
+                                  entry.get('feedback', {}).get('I am satisfied with the quality of the final outcome', 'N/A'))
+                    with col2:
+                        st.metric("Ownership", 
+                                  entry.get('feedback', {}).get('I feel a sense of ownership of the final outcome', 'N/A'))
+                    
+                    st.markdown("---")
+                    st.write(f"**Full Data File:** `{entry.get('filename')}`")
+                    st.write(f"**Summary Length:** {len(summary)} characters")
 
     if st.button("Logout", key="admin_logout_btn"):
         st.session_state.page = 0
