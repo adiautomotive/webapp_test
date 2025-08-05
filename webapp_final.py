@@ -623,10 +623,34 @@ def convert_data_to_csv(data_list):
     return df[existing_cols].to_csv(index=False).encode('utf-8')
 
 # ------------------------
+# Helper for Admin Page: Convert SUMMARIES to CSV
+# ------------------------
+def convert_summaries_to_csv(data_list):
+    if not data_list:
+        return b""
+    
+    # Filter for entries that have a non-empty summary
+    summary_data = [
+        {
+            'prolific_id': entry.get('prolific_id', 'N/A'),
+            'timestamp': entry.get('timestamp', 'N/A'),
+            'summary': entry.get('summary', '')
+        }
+        for entry in data_list if entry.get('summary', '').strip()
+    ]
+    
+    if not summary_data:
+        return b""
+
+    df = pd.DataFrame(summary_data)
+    return df.to_csv(index=False).encode('utf-8')
+
+
+# ------------------------
 # Page 99: Admin Dashboard
 # ------------------------
 def admin_view():
-    st.title("Admin Dashboard: All Submissions")
+    st.title("Admin Dashboard")
     
     os.makedirs(CHAT_LOGS_FOLDER, exist_ok=True)
     all_files = sorted([f for f in os.listdir(CHAT_LOGS_FOLDER) if f.endswith('.json')])
@@ -645,51 +669,90 @@ def admin_view():
         except Exception as e:
             st.error(f"Could not read or parse file {fname}: {e}")
 
-    st.header("Search and Export")
-    search_query = st.text_input("Search by Prolific ID (leave empty for all):", key="admin_search_input")
+    # --- Create Tabs for Different Views ---
+    tab1, tab2 = st.tabs(["All Submissions", "Summaries Dashboard"])
 
-    filtered_data = [d for d in all_data if not search_query or search_query.lower() in d.get('prolific_id', '').lower()]
-    
-    csv_data = convert_data_to_csv(filtered_data)
+    # --- Tab 1: All Submissions (Original View) ---
+    with tab1:
+        st.header("All Submissions")
+        search_query = st.text_input("Search by Prolific ID (leave empty for all):", key="admin_search_input")
 
-    st.download_button(
-        label="📥 Download Filtered Data as CSV", data=csv_data,
-        file_name=f"filtered_submissions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-        mime='text/csv', disabled=not filtered_data
-    )
-    
-    st.markdown("---")
-    st.header(f"Displaying {len(filtered_data)} of {len(all_data)} Submissions")
+        filtered_data = [d for d in all_data if not search_query or search_query.lower() in d.get('prolific_id', '').lower()]
+        
+        csv_data_all = convert_data_to_csv(filtered_data)
 
-    if not filtered_data:
-        st.info("No submissions match your search query.")
-    else:
-        for entry in filtered_data:
-            prolific_id = entry.get('prolific_id', 'N/A')
-            timestamp = entry.get('timestamp', 'N/A')
-            
-            with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
-                st.markdown(f"**Filename:** `{entry.get('filename')}`")
+        st.download_button(
+            label="📥 Download All Filtered Data as CSV", data=csv_data_all,
+            file_name=f"all_submissions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime='text/csv', disabled=not filtered_data
+        )
+        
+        st.markdown("---")
+        st.header(f"Displaying {len(filtered_data)} of {len(all_data)} Submissions")
+
+        if not filtered_data:
+            st.info("No submissions match your search query.")
+        else:
+            for entry in filtered_data:
+                prolific_id = entry.get('prolific_id', 'N/A')
+                timestamp = entry.get('timestamp', 'N/A')
                 
-                if 'survey_responses' in entry:
-                    st.subheader("Survey Responses")
-                    st.json(entry['survey_responses'], expanded=False)
-
-                if 'chat_history' in entry:
-                    st.subheader("Chat History")
-                    for msg in entry['chat_history']:
-                        if msg.get('role') != 'system':
-                            with st.chat_message(name=msg.get('role', 'none')):
-                                st.write(msg.get('content', ''))
-
-                if 'summary' in entry and entry['summary']:
-                    st.subheader("User Summary")
-                    st.text_area("Summary", value=entry['summary'], height=150, disabled=True, key=f"summary_{prolific_id}")
-
-                if 'feedback' in entry:
-                    st.subheader("Feedback Responses")
-                    st.json(entry['feedback'], expanded=False)
+                with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
+                    st.markdown(f"**Filename:** `{entry.get('filename')}`")
                     
+                    if 'survey_responses' in entry:
+                        st.subheader("Survey Responses")
+                        st.json(entry['survey_responses'], expanded=False)
+
+                    if 'chat_history' in entry:
+                        st.subheader("Chat History")
+                        for msg in entry['chat_history']:
+                            if msg.get('role') != 'system':
+                                with st.chat_message(name=msg.get('role', 'none')):
+                                    st.write(msg.get('content', ''))
+
+                    if 'summary' in entry and entry['summary']:
+                        st.subheader("User Summary")
+                        st.text_area("Summary", value=entry['summary'], height=150, disabled=True, key=f"summary_{prolific_id}_{timestamp}")
+
+                    if 'feedback' in entry:
+                        st.subheader("Feedback Responses")
+                        st.json(entry['feedback'], expanded=False)
+
+    # --- Tab 2: Summaries Dashboard ---
+    with tab2:
+        st.header("Summaries Dashboard")
+        
+        # Filter data to only include entries with a summary
+        summary_entries = [d for d in all_data if d.get('summary', '').strip()]
+        
+        csv_data_summaries = convert_summaries_to_csv(summary_entries)
+
+        st.download_button(
+            label="📥 Download All Summaries as CSV", data=csv_data_summaries,
+            file_name=f"summaries_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime='text/csv', disabled=not summary_entries
+        )
+        
+        st.markdown("---")
+        st.header(f"Displaying {len(summary_entries)} Summaries")
+
+        if not summary_entries:
+            st.info("No summaries have been submitted yet.")
+        else:
+            for entry in summary_entries:
+                prolific_id = entry.get('prolific_id', 'N/A')
+                timestamp = entry.get('timestamp', 'N/A')
+                
+                with st.expander(f"**ID:** {prolific_id}  |  **Time:** {timestamp}"):
+                    st.text_area(
+                        "Summary", 
+                        value=entry['summary'], 
+                        height=200, 
+                        disabled=True, 
+                        key=f"summary_display_{prolific_id}_{timestamp}"
+                    )
+
     if st.button("Logout", key="admin_logout_btn"):
         st.session_state.page = 0
         st.rerun()
