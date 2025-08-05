@@ -489,7 +489,7 @@ def page3():
 
 
 # ------------------------
-# Page 6: Summary
+# Page 6: Summary (CORRECTED)
 # ------------------------
 def page4():
     st.title("Summary")
@@ -500,13 +500,14 @@ def page4():
     )
 
     if st.button("Submit Summary", key="submit_summary_btn"):
-        # Check the most current value from session_state right after the button is clicked
-        summary_text = st.session_state.get("summary_text", "")
+        # CRITICAL FIX: Check the session state *after* the button is clicked.
+        summary_input = st.session_state.get("summary_text", "")
         
-        if not summary_text.strip():
+        if not summary_input.strip():
             st.error("Please provide a summary before proceeding.")
         else:
-            # The data is already in st.session_state.summary_text, so we just navigate
+            # The value is already correctly stored in st.session_state.summary_text by the widget's key.
+            # We just need to navigate to the next page.
             st.session_state.page = 7
             st.rerun()
 
