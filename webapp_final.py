@@ -260,10 +260,11 @@ def personality_and_ai_survey_page():
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
-        "Disagree", 
-        "Neutral", 
-        "Agree", 
+        "Somewhat Disagree", 
+        "Neither Agree or Disagree", 
+        "Somewhat Agree", 
         "Strongly Agree"
+
     ]
     
     matrix_questions = {
@@ -316,10 +317,11 @@ def trust_survey_page():
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
-        "Disagree", 
-        "Neutral", 
-        "Agree", 
+        "Somewhat Disagree", 
+        "Neither Agree or Disagree", 
+        "Somewhat Agree", 
         "Strongly Agree"
+
     ]
     
     trust_questions = {
