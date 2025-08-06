@@ -514,9 +514,9 @@ def feedback_page():
     likert_options = [
         "- Please select -",
         "Strongly Disagree", 
-        "Disagree", 
-        "Neutral", 
-        "Agree", 
+        "Somewhat Disagree", 
+        "Neither Agree or Disagree", 
+        "Somewhat Agree", 
         "Strongly Agree"
     ]
 
