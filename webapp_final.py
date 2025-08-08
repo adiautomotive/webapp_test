@@ -582,8 +582,34 @@ def feedback_page():
 # ------------------------
 def page5():
     st.title("Thank You!")
-    st.markdown("Thank you for completing the survey, you may now close this window.")
+    st.markdown("Thank you so much for taking part in our study — we really appreciate your time and creativity! To finish up and let Prolific know you've completed the study, please click the button below.")
     st.balloons()
+
+    # Prolific completion button
+    prolific_completion_url = "https://app.prolific.com/submissions/complete?cc=C125EE5M"
+    
+    st.markdown(
+        f"""
+        <a href="{prolific_completion_url}" target="_blank">
+            <button style="
+                background-color: #4CAF50; /* Green */
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 12px;
+            ">
+            Complete Study on Prolific
+            </button>
+        </a>
+        """,
+        unsafe_allow_html=True
+    )
 
 # ------------------------
 # Helper for Admin Page: Convert data to CSV
