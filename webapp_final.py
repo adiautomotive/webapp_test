@@ -588,27 +588,10 @@ def page5():
     # Prolific completion button
     prolific_completion_url = "https://app.prolific.com/submissions/complete?cc=C125EE5M"
     
-    st.markdown(
-        f"""
-        <a href="{prolific_completion_url}" target="_blank">
-            <button style="
-                background-color: #4CAF50; /* Green */
-                border: none;
-                color: white;
-                padding: 15px 32px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 12px;
-            ">
-            Complete Study on Prolific
-            </button>
-        </a>
-        """,
-        unsafe_allow_html=True
+    st.link_button(
+        "Complete Study on Prolific",
+        url=prolific_completion_url,
+        type="primary"
     )
 
 # ------------------------
