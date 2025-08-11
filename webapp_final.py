@@ -397,10 +397,14 @@ def page2():
     st.markdown("""
         ### Let’s imagine something wild together.
         Starting tomorrow, all humans can fly. How would that change cities, society, and daily life? That’s what we’re here to explore.
-        - **Your Task:** Brainstorm ideas back and forth with an AI assistant for a limited number of turns.
-        - **Goal:** After the brainstorming session concludes, you will be asked to write a short summary of your discussion.
+        - **Your Task:** Treat the LLM as your creative teammate and brainstorm ideas back and forth for exactly **10 turns**. You’ll kick things off — share the first idea that comes to mind. After that, you and the LLM will trade ideas, building on each other’s thoughts, exploring new directions, and challenging each other.
+        - **Your Role** - Bring many and varied ideas— aim for both **quantity** and **diversity** - Don't be afraid to discuss surprising, unusual, or even impossible ways flying can change cities, society, and daily life!
+          **After the discussion:** Independently answer the original question in your own words, drawing from any ideas sparked during your chat. 
+
+             Drop your first idea and let’s build a world together! 
         """)
     next_button(current_page=4, next_page=5, label="Start Brainstorming", key="start_brainstorming_btn")
+
 
 # ------------------------
 # Page 5: Chat Interface 
